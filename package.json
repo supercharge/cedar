@@ -1,0 +1,60 @@
+{
+  "name": "@supercharge/console",
+  "description": "Build beautiful command line applications",
+  "version": "0.0.0",
+  "author": "Marcus Pöhls <marcus@superchargejs.com>",
+  "bugs": {
+    "url": "https://github.com/supercharge/console/issues"
+  },
+  "dependencies": {
+    "@supercharge/goodies": "~1.9.0",
+    "@supercharge/map": "~1.3.0",
+    "minimist": "~1.2.5"
+  },
+  "devDependencies": {
+    "@supercharge/tsconfig": "~1.0.0",
+    "@types/minimist": "~1.2.1",
+    "@types/node": "~14.14.41",
+    "@typescript-eslint/eslint-plugin": "~4.22.0",
+    "ava": "~4.0.0-alpha.2",
+    "eslint": "~7.24.0",
+    "eslint-config-standard-with-typescript": "~20.0.0",
+    "eslint-plugin-import": "~2.22.1",
+    "eslint-plugin-node": "~11.1.0",
+    "eslint-plugin-promise": "~4.3.1",
+    "eslint-plugin-standard": "~4.1.0",
+    "nyc": "~15.1.0",
+    "typescript": "~4.2.4"
+  },
+  "main": "dist",
+  "types": "dist",
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/supercharge/console",
+  "keywords": [
+    "console",
+    "cli",
+    "framework",
+    "nodejs",
+    "javascript",
+    "supercharge",
+    "superchargejs"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/supercharge/console.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src --ext .js,.ts",
+    "lint:fix": "npm run lint -- --fix",
+    "test": "npm run build && npm run lint && npm run test:run",
+    "test:run": "nyc --reporter=html --reporter=text ava"
+  }
+}
