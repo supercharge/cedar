@@ -105,20 +105,23 @@ export class Application {
 
   /**
    * Runs the incoming console command for the given `input`.
+   * By default, `input` equals `process.argv`.
    *
    * @param {String[]} input - command line arguments (process.argv)
+   *
+   * @throws
    */
   async run (input?: string[]): Promise<void> {
     const argv = new ArgvInput(input)
 
     const command = this.commands().find(command => {
-      return command.name() === argv.commandName()
+      return command.name() === argv.firstArgument()
     })
 
     if (command) {
       return await command.run()
     }
 
-    throw new Error(`No command registered with name "${argv.commandName()}"`)
+    throw new Error(`No command registered with name "${argv.firstArgument()}"`)
   }
 }

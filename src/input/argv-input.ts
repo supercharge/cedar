@@ -37,11 +37,11 @@ export class ArgvInput {
   }
 
   /**
-   * Returns the command name.
+   * Returns the first argument. This typically represents the command name (if available).
    *
    * @returns {String}
    */
-  commandName (): string {
+  firstArgument (): string {
     return this.parsed._[0]
   }
 
