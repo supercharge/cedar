@@ -119,9 +119,9 @@ export class Application {
     })
 
     if (command) {
-      return await command.run()
+      return await command.run(argv)
     }
 
-    throw new Error(`No command registered with name "${argv.firstArgument()}"`)
+    throw new Error(`No command registered with name "${String(argv.firstArgument())}"`)
   }
 }
