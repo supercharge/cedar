@@ -1,18 +1,21 @@
 'use strict'
 
-import { tap } from '@supercharge/goodies'
+import Map from '@supercharge/map'
 import { Application } from './application'
+import { tap, upon } from '@supercharge/goodies'
 import { CommandContract } from './command-contract'
 import { InputArgument } from './input/input-argument'
 import { InputArgumentBuilder } from './input/input-argument-builder'
+import { ArgvInput } from './input/argv-input'
 
 interface CommandMeta {
   name: string
   description: string | undefined
   application: Application | undefined
 
-  aliases: string[]
-  arguments: InputArgument[]
+  aliases: Set<string>
+
+  arguments: Map<string, InputArgument>
 }
 
 export class Command implements CommandContract {
@@ -22,9 +25,9 @@ export class Command implements CommandContract {
     this.meta = {
       name: name ?? this.constructor.name,
       description: undefined,
-      aliases: [],
+      aliases: new Set(),
 
-      arguments: [],
+      arguments: new Map(),
       application: undefined
     }
 
@@ -60,15 +63,31 @@ export class Command implements CommandContract {
     })
   }
 
+  /**
+   * Set the console application instance.
+   *
+   * @param {Application} application
+   *
+   * @returns {Command}
+   */
   setApplication (application: Application): this {
     return tap(this, () => {
       this.meta.application = application
     })
   }
 
+  /**
+   * Add the given `alias` as an alternative command name. For example: imagine your
+   * CLI provides a database migration command. You may want to run the migrations
+   * using `migration:run` or `migrate`. You can do this by using an alias.
+   *
+   * @param {String} alias
+   *
+   * @returns {Command}
+   */
   addAlias (alias: string): this {
     return tap(this, () => {
-      this.aliases().push(alias)
+      this.meta.aliases.add(alias)
     })
   }
 
@@ -79,7 +98,7 @@ export class Command implements CommandContract {
    * @returns {String[]}
    */
   aliases (): string[] {
-    return this.meta.aliases
+    return Array.from(this.meta.aliases)
   }
 
   /**
@@ -104,24 +123,49 @@ export class Command implements CommandContract {
      */
   }
 
-  arguments (): InputArgument[] {
+  /**
+   * Returns the input arguments for this command.
+   *
+   * @returns {Map}
+   */
+  arguments (): Map<string, InputArgument> {
     return this.meta.arguments
   }
 
+  /**
+   * Creates a new argument for the given `name` for this command. Returns a
+   * builder instance to configure the added argument with fluent methods.
+   *
+   * @param {String} name
+   *
+   * @returns {InputArgumentBuilder}
+   *
+   * @throws
+   */
   addArgument (name: string): InputArgumentBuilder {
     if (!name) {
       throw new Error(`Missing argument name in command ${this.constructor.name}`)
     }
 
-    const argument = new InputArgument(name)
+    return upon(new InputArgument(name), argument => {
+      this.arguments().set(name, argument)
 
-    this.arguments().push(argument)
-
-    return new InputArgumentBuilder(argument)
+      return new InputArgumentBuilder(argument)
+    })
   }
 
-  async run (): Promise<any> {
-    await this.handle()
+  /**
+   * Run the command.
+   *
+   * The code to run is provided in the `handle` method. This
+   * `handle` method must be implemented by subclasses.
+   */
+  async run (_argv: ArgvInput): Promise<any> {
+    try {
+      await this.handle()
+    } catch (error) {
+      // pretty-print command error
+    }
   }
 
   /**
