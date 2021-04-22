@@ -1,9 +1,11 @@
 'use strict'
 
+import Map from '@supercharge/map'
 import { tap } from '@supercharge/goodies'
-import minimist, { ParsedArgs } from 'minimist'
+import minimist, { ParsedArgs, Opts as Options } from 'minimist'
+// import { InputInterface } from './input-interface'
 
-export class ArgvInput {
+export class ArgvInput {// implements InputInterface {
   /**
    * The input tokens.
    */
@@ -14,9 +16,24 @@ export class ArgvInput {
    */
   private parsed: ParsedArgs
 
-  constructor (argv?: string[]) {
-    this.tokens = argv ?? process.argv.slice(2)
+  /**
+   * The parsed input tokens.
+   */
+  private readonly meta: {
+    options: Map<string, unknown>
+  }
+
+  /**
+   * Create a new instance for the given `args`.
+   *
+   * @param args
+   */
+  constructor (args?: string[]) {
+    this.tokens = args ?? process.argv.slice(2)
     this.parsed = { _: [] }
+
+    this.meta = { options: new Map() }
+
     this.parse()
   }
 
@@ -29,8 +46,8 @@ export class ArgvInput {
   /**
    * Parse the input.
    */
-  parse (): void {
-    this.parsed = minimist(this.tokens)
+  parse (options?: Options): void {
+    this.parsed = minimist(this.tokens, options ?? {})
   }
 
   /**
@@ -39,7 +56,7 @@ export class ArgvInput {
    * @returns {String}
    */
   firstArgument (): string {
-    return this.parsed._[0]
+    return this.parsed._[0] ?? ''
   }
 
   /**
@@ -77,9 +94,45 @@ export class ArgvInput {
    * }
    * ```
    */
-  options (): {[key: string]: unknown} {
-    const { _, ...rest } = this.parsed
+  options (): Map<string, unknown> {
+    if (this.meta.options.isEmpty()) {
+      const { _, ...rest } = this.parsed
 
-    return { ...rest }
+      Object
+        .entries({ ...rest })
+        .forEach(([key, value]) => {
+          this.meta.options.set(key, value)
+        })
+    }
+
+    return this.meta.options
+  }
+
+  /**
+   * Returns the option value for the given `name`.
+   */
+  option (name: string): unknown {
+    return this.options().get(name)
+  }
+
+  /**
+    * Set an option for the given `name` and assign the `value`.
+    *
+    * @param {String} name
+    * @param {*} value
+    */
+  setOption (name: string, value: unknown): this {
+    return tap(this, () => {
+      this.meta.options.set(name, value)
+    })
+  }
+
+  /**
+    * Determine whether an option with the given `name` exists.
+    *
+    * @param {String} name
+    */
+  hasOption (name: string): boolean {
+    return this.options().has(name)
   }
 }
