@@ -9,6 +9,7 @@ class HelloCommand extends Command {
 
   configure () {
     this.addArgument('name').description('The name to greet.').defaultValue('Marcus').required()
+    this.addOption('dry-run').shortcuts('d').description('dry run mode')
   }
 
   async handle () {
