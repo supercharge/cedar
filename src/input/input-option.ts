@@ -13,9 +13,9 @@ export class InputOption {
     name: string
 
     /**
-     * The shortcut name.
+     * The avaialble shortcuts.
      */
-    shortcut?: string
+    shortcuts: string[]
 
     /**
      * The argument description.
@@ -39,7 +39,11 @@ export class InputOption {
    * @param {String} name
    */
   constructor (name: string) {
-    this.meta = { name: name ?? '', required: false }
+    this.meta = {
+      name: name ?? '',
+      required: false,
+      shortcuts: []
+    }
   }
 
   /**
@@ -78,20 +82,28 @@ export class InputOption {
    *
    * @returns {String}
    */
-  shortcut (): string | undefined {
-    return this.meta.shortcut
+  shortcuts (): string[] {
+    return Array.from(
+      new Set(this.meta.shortcuts)
+    )
   }
 
   /**
    * Set the option shortcut.
    *
-   * @param {String} shortcut
+   * @param {String} shortcuts
    *
    * @returns {InputOption}
    */
-  setShortcut (shortcut: string): this {
+  addShortcuts (shortcuts: string | string[]): this {
+    const test = this.meta.shortcuts
+      .concat(shortcuts || [])
+      .map(shortcut => {
+        return String(shortcut).trim()
+      })
+
     return tap(this, () => {
-      this.meta.shortcut = String(shortcut).trim()
+      this.meta.shortcuts = test
     })
   }
 
