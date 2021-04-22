@@ -2,11 +2,13 @@
 
 import Map from '@supercharge/map'
 import { Application } from './application'
+import { ArgvInput } from './input/argv-input'
 import { tap, upon } from '@supercharge/goodies'
+import { InputOption } from './input/input-option'
 import { CommandContract } from './command-contract'
 import { InputArgument } from './input/input-argument'
 import { InputArgumentBuilder } from './input/input-argument-builder'
-import { ArgvInput } from './input/argv-input'
+import { InputOptionBuilder } from './input/input-option-builder'
 
 interface CommandMeta {
   name: string
@@ -15,6 +17,7 @@ interface CommandMeta {
 
   aliases: Set<string>
 
+  options: Map<string, InputOption>
   arguments: Map<string, InputArgument>
 }
 
@@ -27,6 +30,7 @@ export class Command implements CommandContract {
       description: undefined,
       aliases: new Set(),
 
+      options: new Map(),
       arguments: new Map(),
       application: undefined
     }
@@ -151,6 +155,37 @@ export class Command implements CommandContract {
       this.arguments().set(name, argument)
 
       return new InputArgumentBuilder(argument)
+    })
+  }
+
+  /**
+   * Returns the input options for this command.
+   *
+   * @returns {Map}
+   */
+  options (): Map<string, InputOption> {
+    return this.meta.options
+  }
+
+  /**
+   * Creates a new argument for the given `name` for this command. Returns a
+   * builder instance to configure the added argument with fluent methods.
+   *
+   * @param {String} name
+   *
+   * @returns {InputArgumentBuilder}
+   *
+   * @throws
+   */
+  addOption (name: string): InputOptionBuilder {
+    if (!name) {
+      throw new Error(`Missing option name in command ${this.constructor.name}`)
+    }
+
+    return upon(new InputOption(name), option => {
+      this.options().set(name, option)
+
+      return new InputOptionBuilder(option)
     })
   }
 
