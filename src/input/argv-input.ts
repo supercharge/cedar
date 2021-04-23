@@ -7,9 +7,9 @@ import minimist, { ParsedArgs, Opts as Options } from 'minimist'
 
 export class ArgvInput {// implements InputInterface {
   /**
-   * The input tokens.
+   * The input arguments. By default `process.argv.slice(2)`
    */
-  private tokens: string[]
+  private readonly args: string[]
 
   /**
    * The parsed input tokens.
@@ -29,25 +29,19 @@ export class ArgvInput {// implements InputInterface {
    * @param args
    */
   constructor (args?: string[]) {
-    this.tokens = args ?? process.argv.slice(2)
+    this.args = args ?? process.argv.slice(2)
     this.parsed = { _: [] }
 
     this.meta = { options: new Map() }
-
-    this.parse()
-  }
-
-  setTokens (tokens: string[]): this {
-    return tap(this, () => {
-      this.tokens = tokens
-    })
   }
 
   /**
    * Parse the input.
    */
-  parse (options?: Options): void {
-    this.parsed = minimist(this.tokens, options ?? {})
+  parse (options?: Options): this {
+    return tap(this, () => {
+      this.parsed = minimist(this.args, options ?? {})
+    })
   }
 
   /**
