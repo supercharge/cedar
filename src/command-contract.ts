@@ -4,12 +4,12 @@ export interface CommandContract {
   /**
    * Returns the command name.
    */
-  name (): string
+  getName (): string
 
   /**
    * Returns the command description displayed when calling the help overview.
    */
-  description (): string | undefined
+  getDescription (): string | undefined
 
   /**
    * Configure the command.
