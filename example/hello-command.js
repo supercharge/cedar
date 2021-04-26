@@ -3,17 +3,21 @@
 const { Command } = require('../dist')
 
 class HelloCommand extends Command {
-  name () {
+  getName () {
     return 'hello'
   }
 
   configure () {
+    this.description('Say hello')
+
     this.addArgument('name').description('The name to greet.').defaultValue('Marcus').required()
+
     this.addOption('dry-run').shortcuts('d').description('dry run mode')
   }
 
   async handle () {
-    console.log('handle HELLO ->')
+    throw new Error('PUPER')
+    // console.log('handle HELLO ->')
   }
 }
 

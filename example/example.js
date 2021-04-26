@@ -7,8 +7,18 @@ async function run () {
   const app = new Application('Supercharge Console Example').setVersion('v1.2.3')
 
   app
+    .register('make:migration')
+    .register('make:model', command => {
+      command.description('Scaffolds a new model instance for the given name.')
+    })
     .register('inspire', command => {
-      command.setDescription('Print an inspiring message')
+      command.description('Print an inspiring message')
+    })
+    .register('work', command => {
+      command.description('Do the work.')
+      command.handle = () => {
+        throw new Error('This does not work!')
+      }
     })
     .add(new HelloCommand())
 
