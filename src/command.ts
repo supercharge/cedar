@@ -13,7 +13,7 @@ import { InputOptionBuilder } from './input/input-option-builder'
 interface CommandMeta {
   name: string
   description: string | undefined
-  application: Application | undefined
+  application?: Application
 
   aliases: Set<string>
 
@@ -24,6 +24,11 @@ interface CommandMeta {
 export class Command implements CommandContract {
   private readonly meta: CommandMeta
 
+  /**
+   * Create a new command instance.
+   *
+   * @param {String} name
+   */
   constructor (name?: string) {
     this.meta = {
       name: name ?? this.constructor.name,
@@ -31,8 +36,7 @@ export class Command implements CommandContract {
       aliases: new Set(),
 
       options: new Map(),
-      arguments: new Map(),
-      application: undefined
+      arguments: new Map()
     }
 
     this.configure()
@@ -43,17 +47,19 @@ export class Command implements CommandContract {
    *
    * @returns {String}
    */
-  name (): string {
+  getName (): string {
     return this.meta.name
   }
 
   /**
-   * Returns the command description displayed when calling the help overview.
+   * Set the command name.
    *
-   * @returns {String}
+   * @returns {Command}
    */
-  description (): string | undefined {
-    return this.meta.description
+  name (name: string): this {
+    return tap(this, () => {
+      this.meta.name = name
+    })
   }
 
   /**
@@ -61,7 +67,18 @@ export class Command implements CommandContract {
    *
    * @returns {String}
    */
-  setDescription (description: string): this {
+  getDescription (): string | undefined {
+    return this.meta.description
+  }
+
+  /**
+   * Set the command description
+   *
+   * @param {String} alias
+   *
+   * @returns {Command}
+   */
+  description (description: string): this {
     return tap(this, () => {
       this.meta.description = description
     })
@@ -78,6 +95,19 @@ export class Command implements CommandContract {
     return tap(this, () => {
       this.meta.application = application
     })
+  }
+
+  /**
+   * Returns the console application instance.
+   *
+   * @returns {Application}
+   */
+  application (): Application {
+    if (!this.meta.application) {
+      throw new Error('Missing application instance.')
+    }
+
+    return this.meta.application
   }
 
   /**
