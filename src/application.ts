@@ -4,6 +4,7 @@ import kleur from 'kleur'
 import { Command } from './command'
 import { tap } from '@supercharge/goodies'
 import { ArgvInput } from './input/argv-input'
+import { ListCommands } from './command/list-command'
 // import { findAllBrackets } from './utils'
 
 interface ApplicationMeta {
@@ -21,6 +22,11 @@ interface ApplicationMeta {
    * The command list.
    */
   commands: Command[]
+
+  /**
+   * The default command to run on empty input.
+   */
+  defaultCommand: Command
 }
 
 export class Application {
@@ -37,7 +43,8 @@ export class Application {
   constructor (name: string = '') {
     this.meta = {
       name,
-      commands: []
+      commands: [],
+      defaultCommand: new ListCommands().setApplication(this)
     }
   }
 
@@ -92,6 +99,15 @@ export class Application {
    */
   commands (): Command[] {
     return this.meta.commands
+  }
+
+  /**
+   * Returns the default command.
+   *
+   * @returns {Command}
+   */
+  defaultCommand (): Command {
+    return this.meta.defaultCommand
   }
 
   /**
@@ -158,18 +174,24 @@ export class Application {
     const commandName = argv.firstArgument()
 
     const command = this.commands().find(command => {
-      return command.name() === commandName
+      return command.getName() === commandName
     })
 
-    if (command) {
-      return await command.run(argv)
-    }
+    try {
+      if (command) {
+        await command.run(argv)
+        return await this.terminate()
+      }
 
-    if (commandName) {
-      throw new Error(`No command registered with name "${commandName}"`)
-    }
+      if (commandName) {
+        throw new Error(`"${commandName}" command not registered`)
+      }
 
-    await this.defaultCommand().run(argv)
+      await this.defaultCommand().run(argv)
+      await this.terminate()
+    } catch (error) {
+      await this.terminate(error)
+    }
   }
 
   /**
@@ -198,7 +220,29 @@ export class Application {
     }
   }
 
-  defaultCommand (): Command {
-    return this.meta.defaultCommand
+  private async terminate (error?: Error): Promise<void> {
+    const exitCode = error ? 1 : 0
+
+    if (!error) {
+      return process.exit(exitCode)
+    }
+
+    if (error) {
+      console.log(
+        `\n${kleur.bgRed().white().bold(' ERROR ')} ${error.message}\n`
+      )
+
+      return
+    }
+
+    console.log(
+      `${kleur.white().bold('PUP')}`
+    )
+
+    console.log(
+      `${kleur.bgRed().white().bold('FATAL')}`
+    )
+
+    return process.exit(exitCode)
   }
 }
