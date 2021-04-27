@@ -4,7 +4,7 @@ const { Application } = require('../dist')
 const HelloCommand = require('./hello-command')
 
 async function run () {
-  const app = new Application('Supercharge Console Example').setVersion('v1.2.3')
+  const app = new Application('Supercharge Console Example').setVersion('v1.1.3')
 
   app
     .register('make:migration')
