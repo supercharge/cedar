@@ -12,6 +12,7 @@ module.exports = {
     project: './tsconfig.json'
   },
   rules: {
+    '@typescript-eslint/no-invalid-void-type': 0,
     '@typescript-eslint/method-signature-style': 0,
     '@typescript-eslint/strict-boolean-expressions': 0
   }
