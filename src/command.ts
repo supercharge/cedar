@@ -9,6 +9,7 @@ import { CommandContract } from './command-contract'
 import { InputArgument } from './input/input-argument'
 import { InputArgumentBuilder } from './input/input-argument-builder'
 import { InputOptionBuilder } from './input/input-option-builder'
+import { ConsoleOutput } from './io/console-output'
 
 interface CommandMeta {
   name: string
@@ -19,6 +20,8 @@ interface CommandMeta {
 
   options: Map<string, InputOption>
   arguments: Map<string, InputArgument>
+
+  output: ConsoleOutput
 }
 
 export class Command implements CommandContract {
@@ -36,7 +39,9 @@ export class Command implements CommandContract {
       aliases: new Set(),
 
       options: new Map(),
-      arguments: new Map()
+      arguments: new Map(),
+
+      output: new ConsoleOutput()
     }
 
     this.configure()
@@ -67,8 +72,8 @@ export class Command implements CommandContract {
    *
    * @returns {String}
    */
-  getDescription (): string | undefined {
-    return this.meta.description
+  getDescription (): string {
+    return this.meta.description ?? ''
   }
 
   /**
@@ -220,6 +225,15 @@ export class Command implements CommandContract {
   }
 
   /**
+   * Returns the output interface.
+   *
+   * @returns {ConsoleOutput}
+   */
+  output (): ConsoleOutput {
+    return this.meta.output
+  }
+
+  /**
    * Run the command.
    *
    * The code to run is provided in the `handle` method. This
@@ -230,6 +244,10 @@ export class Command implements CommandContract {
       await this.handle()
     } catch (error) {
       // pretty-print command error
+
+      this.output().log('')
+      this.output().error(error)
+      this.output().log('')
     }
   }
 
@@ -239,6 +257,6 @@ export class Command implements CommandContract {
    * @returns {Promise}
    */
   handle (): any | Promise<any> {
-    throw new Error(`You must implement the "handle" method in your "${this.constructor.name}" command`)
+    throw new Error(`You must implement the "handle" method in your "${this.getName()}" command`)
   }
 }

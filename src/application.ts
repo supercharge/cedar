@@ -168,7 +168,7 @@ export class Application {
     })
 
     if (argv.hasOption('version')) {
-      return this.outputVersion()
+      return this.outputNameAndVersion()
     }
 
     const commandName = argv.firstArgument()
@@ -204,9 +204,9 @@ export class Application {
   }
 
   /**
-   * Print the application version to the console.
+   * Print the application name and version to the console.
    */
-  outputVersion (): void {
+  outputNameAndVersion (): void {
     if (this.name() && this.version()) {
       return console.log(`${this.name()} ${kleur.green(this.version())}`)
     }

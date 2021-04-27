@@ -1,6 +1,5 @@
 'use strict'
 
-import kleur from 'kleur'
 import { Command } from '../command'
 
 export class ListCommands extends Command {
@@ -17,12 +16,18 @@ export class ListCommands extends Command {
    * Output all available commands in the application to the console.
    */
   async handle (): Promise<void> {
+    this.outputAppVersion()
     this.outputCommandOverview()
     this.outputFlagOverview()
   }
 
+  private outputAppVersion (): void {
+    this.application().outputNameAndVersion()
+    this.output().log('')
+  }
+
   private outputCommandOverview (): void {
-    const commandWithLongestName = this.application().commands().sort((a, b) => {
+    const commandWithLongestName = [...this.application().commands()].sort((a, b) => {
       return b.getName().length - a.getName().length
     }).shift()
 
@@ -32,15 +37,15 @@ export class ListCommands extends Command {
 
     this.groupAndSortCommands().forEach(group => {
       if (group.name === 'root') {
-        console.log(kleur.bold().magenta('Available commands:'))
+        console.log(this.output().log().bold().magenta('Available commands:'))
       } else {
-        console.log(kleur.bold().magenta(group.name))
+        console.log(this.output().log().bold().magenta(group.name))
       }
 
       group.commands.forEach(command => {
         const whiteSpace = ''.padEnd(maxWidth - command.getName().length)
 
-        console.log(`  ${kleur.yellow(command.getName())} ${whiteSpace} ${kleur.dim(command.getDescription() ?? '')}`)
+        console.log(`  ${this.output().log().yellow(command.getName())} ${whiteSpace} ${this.output().log().white().dim(command.getDescription())}`)
       })
 
       console.log()
