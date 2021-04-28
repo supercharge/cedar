@@ -34,22 +34,19 @@ export class ConsoleOutput {
       `${this.log().bgRed().white().bold(' error ')} ${(message as Error).message}\n`
     )
     this.log(
-      `${this.log().red().bold(' ERROR ')} ${(message as Error).message}\n`
+      `${this.log().red().bold(' ERROR ')}  ${(message as Error).message}\n`
     )
     this.log(
-      `${this.log().bgRed().white().bold(' ERROR ')} ${(message as Error).message}\n`
+      `${this.log().bgRed().white().bold(' ERROR ')}  ${(message as Error).message}`
     )
 
-    const lines = (message as Error).stack?
-.split('\n')
-    .splice(1)
-    .map((line: string) => {
-      return `${this.log().dim(line)}`
-    })
-    .join('\n')`
+    const lines = (message as Error).stack?.split('\n')
+      .splice(1)
+      .map((line: string) => {
+        return `${this.log().dim(line)}`
+      })
+      .join('\n')
 
-    this.log(
-      `${this.log().bgRed().white().bold(' ERROR ')} ${}\n`
-    )
+    this.log(this.log().dim(lines ?? ''))
   }
 }
