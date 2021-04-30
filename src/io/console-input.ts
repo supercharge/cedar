@@ -1,8 +1,9 @@
 'use strict'
 
-import Enquirer from 'enquirer'
-import { PromptBuilder } from './prompt-builder'
-import { TextPromptOptions } from './console-input-contracts'
+import Prompt from 'prompts'
+import { PromptBuilder } from './builder/prompt'
+import { ConfirmBuilder } from './builder/confirm'
+import { QuestionBuilder } from './builder/question'
 
 export class ConsoleInput {
   /**
@@ -12,16 +13,19 @@ export class ConsoleInput {
    *
    * @returns {String}
    */
-  async ask (question: string, options?: TextPromptOptions): Promise<string> {
-    const prompt = new PromptBuilder()
-      .add('type', 'input')
-      .add('name', options?.name ?? 'value')
-      .add('message', question)
-      .add('initial', options?.default)
-      .add('hint', options?.hint)
-      .build()
+  async ask<T extends string> (question: string, callback: (questionBuilder: QuestionBuilder) => unknown): Promise<T> {
+    const builder = new PromptBuilder()
+      .type('text')
+      .name('value')
+      .question(question)
 
-    return await Enquirer.prompt(prompt as any)
+    if (callback) {
+      callback(new QuestionBuilder(builder))
+    }
+
+    const result = await Prompt(builder.build())
+
+    return result.value
   }
 
   /**
@@ -32,9 +36,19 @@ export class ConsoleInput {
    *
    * @returns {Boolean}
    */
-  async confirm (_question: string): Promise<boolean> {
-    //
-    return true
+  async confirm (question: string, callback: (confirmBuilder: ConfirmBuilder) => unknown): Promise<boolean> {
+    const builder = new PromptBuilder()
+      .type('confirm')
+      .name('value')
+      .question(question)
+
+    if (callback) {
+      callback(new ConfirmBuilder(builder))
+    }
+
+    const result = await Prompt(builder.build())
+
+    return result.value
   }
 
   /**
