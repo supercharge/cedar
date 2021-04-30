@@ -23,7 +23,7 @@ export class ListCommands extends Command {
 
   private outputAppVersion (): void {
     this.application().outputNameAndVersion()
-    this.output().log('')
+    this.io().log('')
   }
 
   private outputCommandOverview (): void {
@@ -37,15 +37,15 @@ export class ListCommands extends Command {
 
     this.groupAndSortCommands().forEach(group => {
       if (group.name === 'root') {
-        console.log(this.output().log().bold().magenta('Available commands:'))
+        console.log(this.io().colors().bold().magenta('Available commands:'))
       } else {
-        console.log(this.output().log().bold().magenta(group.name))
+        console.log(this.io().colors().bold().magenta(group.name))
       }
 
       group.commands.forEach(command => {
         const whiteSpace = ''.padEnd(maxWidth - command.getName().length)
 
-        console.log(`  ${this.output().log().yellow(command.getName())} ${whiteSpace} ${this.output().log().white().dim(command.getDescription())}`)
+        console.log(`  ${this.io().colors().yellow(command.getName())} ${whiteSpace} ${this.io().colors().white().dim(command.getDescription())}`)
       })
 
       console.log()

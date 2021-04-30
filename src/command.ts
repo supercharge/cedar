@@ -229,7 +229,7 @@ export class Command implements CommandContract {
    *
    * @returns {ConsoleOutput}
    */
-  output (): ConsoleOutput {
+  io (): ConsoleOutput {
     return this.meta.output
   }
 
@@ -245,9 +245,9 @@ export class Command implements CommandContract {
     } catch (error) {
       // pretty-print command error
 
-      this.output().log('')
-      this.output().error(error)
-      this.output().log('')
+      this.io().log('')
+      this.io().error(error)
+      this.io().log('')
     }
   }
 
