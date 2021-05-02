@@ -198,7 +198,7 @@ export class Application {
    *
    * @returns {Object}
    */
-  defaultAliases (): {[key: string]: string|string[]} {
+  defaultAliases (): { [key: string]: string|string[] } {
     return { help: 'h', version: 'v' }
   }
 
@@ -226,21 +226,8 @@ export class Application {
       return process.exit(exitCode)
     }
 
-    if (error) {
-      console.log(
-        `\n${kleur.bgRed().white().bold(' ERROR ')} ${error.message}\n`
-      )
-
-      return
-    }
-
-    console.log(
-      `${kleur.white().bold('PUP')}`
-    )
-
-    console.log(
-      `${kleur.bgRed().white().bold('FATAL')}`
-    )
+    // TODO use console-io to log error
+    console.log(`\n${kleur.bgRed().white().bold(' ERROR ')}  ${error.message}\n`)
 
     return process.exit(exitCode)
   }
