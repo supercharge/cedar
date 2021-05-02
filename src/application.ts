@@ -5,7 +5,6 @@ import { Command } from './command'
 import { tap } from '@supercharge/goodies'
 import { ArgvInput } from './input/argv-input'
 import { ListCommands } from './command/list-command'
-// import { findAllBrackets } from './utils'
 
 interface ApplicationMeta {
   /**
@@ -179,7 +178,7 @@ export class Application {
 
     try {
       if (command) {
-        await command.run(argv)
+        await command.handle(argv)
         return await this.terminate()
       }
 
@@ -187,7 +186,7 @@ export class Application {
         throw new Error(`"${commandName}" command not registered`)
       }
 
-      await this.defaultCommand().run(argv)
+      await this.defaultCommand().handle(argv)
       await this.terminate()
     } catch (error) {
       await this.terminate(error)
