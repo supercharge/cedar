@@ -21,6 +21,9 @@ export class ListCommands extends Command {
     this.outputFlagOverview()
   }
 
+  /**
+   * Print the application version to the terminal.
+   */
   private outputAppVersion (): void {
     this.application().outputNameAndVersion()
     this.io().log('')
