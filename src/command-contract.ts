@@ -17,10 +17,7 @@ export interface CommandContract {
   configure (): void
 
   /**
-   * Handle the console command.
-   *
-   * @param {*} parameters
-   * @param {*} options
+   * Run the console command.
    */
-  handle(): any | Promise<any>
+  run(): any | Promise<any>
 }

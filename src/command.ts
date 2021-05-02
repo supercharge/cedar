@@ -25,6 +25,9 @@ interface CommandMeta {
 }
 
 export class Command implements CommandContract {
+  /**
+   * Store the command meta data.
+   */
   private readonly meta: CommandMeta
 
   /**
@@ -239,16 +242,24 @@ export class Command implements CommandContract {
    * The code to run is provided in the `handle` method. This
    * `handle` method must be implemented by subclasses.
    */
-  async run (_argv: ArgvInput): Promise<any> {
+  async handle (_argv: ArgvInput): Promise<any> {
     try {
-      await this.handle()
+      await this.run()
     } catch (error) {
-      // pretty-print command error
-
-      this.io().log('')
-      this.io().error(error)
-      this.io().log('')
+      this.prettyPrint(error)
     }
+  }
+
+  /**
+   * Pretty-print the given `error` in the terminal.
+   *
+   * @param {Error} error
+   */
+  prettyPrint (error: Error): void {
+    this.io()
+      .emptyLine()
+      .error(error)
+      .emptyLine()
   }
 
   /**
@@ -256,7 +267,7 @@ export class Command implements CommandContract {
    *
    * @returns {Promise}
    */
-  handle (): any | Promise<any> {
+  run (): any | Promise<any> {
     throw new Error(`You must implement the "handle" method in your "${this.getName()}" command`)
   }
 }
