@@ -15,9 +15,7 @@ class HelloCommand extends Command {
     this.addOption('random').shortcuts('r').description('random')
   }
 
-  async handle () {
-    console.log(this.options().get('random'))
-
+  async run () {
     const name = this.options().get('random')
       ? 'Marcus'
       : this.arguments().get('name')
