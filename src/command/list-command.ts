@@ -15,7 +15,7 @@ export class ListCommands extends Command {
   /**
    * Output all available commands in the application to the console.
    */
-  async handle (): Promise<void> {
+  async run (): Promise<void> {
     this.outputAppVersion()
     this.outputCommandOverview()
     this.outputFlagOverview()
