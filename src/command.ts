@@ -5,20 +5,19 @@ import { Application } from './application'
 import { ArgvInput } from './input/argv-input'
 import { tap, upon } from '@supercharge/goodies'
 import { InputOption } from './input/input-option'
+import { ConsoleOutput } from './io/console-output'
 import { CommandContract } from './command-contract'
 import { InputArgument } from './input/input-argument'
 import { InputArgumentBuilder } from './input/input-argument-builder'
 import { InputOptionBuilder } from './input/input-option-builder'
-import { ConsoleOutput } from './io/console-output'
 
 interface CommandMeta {
   name: string
   description: string | undefined
   application?: Application
 
-  aliases: Set<string>
-
   options: Map<string, InputOption>
+  parsedOptions: Map<string, unknown>
   arguments: Map<string, InputArgument>
 
   output: ConsoleOutput
@@ -39,9 +38,10 @@ export class Command implements CommandContract {
     this.meta = {
       name: name ?? this.constructor.name,
       description: undefined,
-      aliases: new Set(),
 
       options: new Map(),
+      parsedOptions: new Map(),
+
       arguments: new Map(),
 
       output: new ConsoleOutput()
@@ -116,31 +116,6 @@ export class Command implements CommandContract {
     }
 
     return this.meta.application
-  }
-
-  /**
-   * Add the given `alias` as an alternative command name. For example: imagine your
-   * CLI provides a database migration command. You may want to run the migrations
-   * using `migration:run` or `migrate`. You can do this by using an alias.
-   *
-   * @param {String} alias
-   *
-   * @returns {Command}
-   */
-  addAlias (alias: string): this {
-    return tap(this, () => {
-      this.meta.aliases.add(alias)
-    })
-  }
-
-  /**
-   * Returns the aliases for this command. For example, this command may have the
-   * `migration:run` name. An alias for this command name can be `migrate`.
-   *
-   * @returns {String[]}
-   */
-  aliases (): string[] {
-    return Array.from(this.meta.aliases)
   }
 
   /**
@@ -242,13 +217,46 @@ export class Command implements CommandContract {
    * The code to run is provided in the `handle` method. This
    * `handle` method must be implemented by subclasses.
    */
-  async handle (_argv: ArgvInput): Promise<any> {
+  async handle (argv: ArgvInput): Promise<any> {
+    const parsed = argv.parse({
+      alias: this.optionsWithAliasMapping()
+      // default: this.optionsWithDefaultValueMapping()
+    })
+
+    console.log(parsed)
+
+    parsed.options().forEach((key: string, value: unknown) => {
+      this.meta.parsedOptions.set(key, value)
+    })
+
+    console.log(this.meta.parsedOptions)
+
     try {
       await this.run()
     } catch (error) {
       this.prettyPrint(error)
     }
   }
+
+  private optionsWithAliasMapping (): { [key: string]: string[] } {
+    const result: { [key: string]: string[] } = {}
+
+    this.options().forEach((key: string, value: InputOption) => {
+      result[key] = value.shortcuts()
+    })
+
+    return result
+  }
+
+  // private optionsWithDefaultValueMapping (): { [key: string]: string[] } {
+  //   const result: { [key: string]: string[] } = {}
+
+  //   this.options().forEach((key: string, value: InputOption) => {
+  //     result[key] = value.defaultValue()
+  //   })
+
+  //   return result
+  // }
 
   /**
    * Pretty-print the given `error` in the terminal.
