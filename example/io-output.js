@@ -7,17 +7,33 @@ async function run () {
 
   output
     .log('normal message')
+    .emptyLine()
+    .success('All tests pass')
+    .success(' PASS ', 'Test suite successful')
+    .emptyLine()
+    .hint('Skipping the following tests')
+    .hint(' SKIP ', 'auth/jwt.ts')
+    .hint(' SKIP ', 'routes/web.ts')
+    .emptyLine()
+    .fail('Tests failed')
+    .fail(' FAIL ', 'tests/auth/jwt.ts')
+    .emptyLine()
+    .tag(' FINISHED ').success('Database migrations')
+    .tag(' SKIPPED ').skipped('Copying .env', 'File already exists.')
+    .tag(' FAILED ').failed('Copying .env', 'File already exists.')
+    .emptyLine()
     .debug('debug message')
     .info('info message')
     .warn('warning message')
-    .error('error message')
-    .error(new Error('error message with stack'))
-
-  output
     .emptyLine()
-    .log(
-      output.colors().yellow().bold('bold yellow message')
-    )
+    .error('single error message (without stack)')
+    .emptyLine()
+    .error(new Error('error message with stack'))
+    .emptyLine()
+
+  output.log(
+    output.colors().yellow().bold('bold yellow message')
+  )
 }
 
 run()
