@@ -12,12 +12,17 @@ class HelloCommand extends Command {
 
     this.addArgument('name').description('The name to greet.').defaultValue('Marcus').required()
 
-    this.addOption('dry-run').shortcuts('d').description('dry run mode')
+    this.addOption('random').shortcuts('r').description('random')
   }
 
   async handle () {
-    throw new Error('PUPER')
-    // console.log('handle HELLO ->')
+    console.log(this.options().get('random'))
+
+    const name = this.options().get('random')
+      ? 'Marcus'
+      : this.arguments().get('name')
+
+    console.log(`Hello ${name}`)
   }
 }
 
