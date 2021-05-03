@@ -4,11 +4,11 @@ import { tap } from '@supercharge/goodies'
 
 export class InputOption {
   /**
-   * The argument name.
+   * The option meta data.
    */
   private readonly meta: {
     /**
-     * The argument name.
+     * The option name.
      */
     name: string
 
@@ -18,17 +18,17 @@ export class InputOption {
     shortcuts: string[]
 
     /**
-     * The argument description.
+     * The option description.
      */
     description?: string
 
     /**
-     * The argument’s or option’s default value.
+     * The option’s default value.
      */
     defaultValue?: any
 
     /**
-     * Determine whether the argument is required.
+     * Determine whether the option is required.
      */
     required: boolean
   }
@@ -47,7 +47,7 @@ export class InputOption {
   }
 
   /**
-   * Returns the argument name.
+   * Returns the option name.
    *
    * @returns {String}
    */
@@ -56,7 +56,7 @@ export class InputOption {
   }
 
   /**
-   * Returns the argument description.
+   * Returns the option description.
    *
    * @returns {String}
    */
@@ -65,7 +65,7 @@ export class InputOption {
   }
 
   /**
-   * Set the argument description.
+   * Set the option description.
    *
    * @param {String} description
    *
@@ -108,7 +108,7 @@ export class InputOption {
   }
 
   /**
-   * Returns the argument’s default value.
+   * Returns the option’s default value.
    *
    * @returns {*}
    */
@@ -130,7 +130,7 @@ export class InputOption {
   }
 
   /**
-   * Returns `true` if the argument is optional.
+   * Returns `true` if the option is optional.
    *
    * @returns {Boolean}
    */
@@ -139,7 +139,7 @@ export class InputOption {
   }
 
   /**
-   * Returns `true` if the argument is required.
+   * Returns `true` if the option is required.
    *
    * @returns {Boolean}
    */
@@ -148,7 +148,7 @@ export class InputOption {
   }
 
   /**
-   * Mark the argument as required.
+   * Mark the option as required.
    *
    * @returns {InputOption}
    */
@@ -159,7 +159,7 @@ export class InputOption {
   }
 
   /**
-   * Mark the argument as optional.
+   * Mark the option as optional.
    *
    * @returns {InputOption}
    */
