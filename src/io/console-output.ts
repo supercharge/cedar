@@ -59,11 +59,11 @@ export class ConsoleOutput {
    */
   success (label: string, message?: string): this {
     if (typeof label === 'string' && isNullish(message)) {
-      return this.log(`${this.colors().green().bold(label)}`)
+      return this.log(`${this.colors().green(label)}`)
     }
 
     if (typeof label === 'string' && typeof message === 'string') {
-      return this.log(`${this.colors().bgGreen().black().bold(label)}  ${message}`)
+      return this.log(`${this.colors().bgGreen().black(label)}  ${message}`)
     }
 
     throw new Error('Unsupported input when logging a "success" message.')
@@ -78,11 +78,11 @@ export class ConsoleOutput {
    */
   hint (label: string, message?: string): this {
     if (typeof label === 'string' && isNullish(message)) {
-      return this.log(`${this.colors().blue().bold(label)}`)
+      return this.log(`${this.colors().blue(label)}`)
     }
 
     if (typeof label === 'string' && typeof message === 'string') {
-      return this.log(`${this.colors().bgBlue().black().bold(label)}  ${message}`)
+      return this.log(`${this.colors().bgBlue().black(label)}  ${message}`)
     }
 
     throw new Error('Unsupported input when logging a "hint" message.')
@@ -97,7 +97,7 @@ export class ConsoleOutput {
    */
   fail (label: string, message?: string): this {
     if (typeof label === 'string' && isNullish(message)) {
-      return this.logError(`${this.colors().red().bold(label)}`)
+      return this.logError(`${this.colors().red(label)}`)
     }
 
     if (typeof label === 'string' && typeof message === 'string') {
@@ -146,7 +146,7 @@ export class ConsoleOutput {
    */
   info (message: string): this {
     if (typeof message === 'string') {
-      return this.log(`${this.colors().bgCyan().black().bold(' INFO ')}  ${message}`)
+      return this.log(`${this.colors().bgCyan().black(' INFO ')}  ${message}`)
     }
 
     throw new Error(`Unsupported input when logging an info message. Received: ${typeof message}`)
@@ -161,7 +161,7 @@ export class ConsoleOutput {
    */
   warn (message: string): this {
     if (typeof message === 'string') {
-      return this.log(`${this.colors().bgYellow().black().bold(' WARN ')}  ${this.colors().yellow(message)}`)
+      return this.log(`${this.colors().bgYellow().black(' WARN ')}  ${this.colors().yellow(message)}`)
     }
 
     throw new Error(`Unsupported input when logging a warning message. Received: ${typeof message}`)
@@ -175,7 +175,7 @@ export class ConsoleOutput {
    * @returns {ConsoleOutput}
    */
   error (error: string | Error): this {
-    const prefix = this.colors().bgRed().white().bold(' ERROR ')
+    const prefix = this.colors().bgRed().white(' ERROR ')
 
     if (typeof error === 'string') {
       return this.fail(prefix, error)
