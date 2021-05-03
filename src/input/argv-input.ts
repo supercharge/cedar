@@ -2,10 +2,10 @@
 
 import Map from '@supercharge/map'
 import { tap } from '@supercharge/goodies'
+import { InputDefinition } from './input-definition'
 import minimist, { ParsedArgs, Opts as Options } from 'minimist'
-// import { InputInterface } from './input-interface'
 
-export class ArgvInput {// implements InputInterface {
+export class ArgvInput {
   /**
    * The input arguments. By default `process.argv.slice(2)`
    */
@@ -36,12 +36,40 @@ export class ArgvInput {// implements InputInterface {
   }
 
   /**
-   * Parse the input.
+   * Parse the command line input (arguments and options).
    */
   parse (options?: Options): this {
     return tap(this, () => {
       this.parsed = minimist(this.args, options ?? {})
     })
+  }
+
+  /**
+   * Bind the given input `definition` with the provided input options and arguments.
+   *
+   * @param {InputDefinition} definition
+   *
+   * @returns {ArgvInput}
+   *
+   * @param definition
+   */
+  public bind (definition: InputDefinition): this {
+    // TODO
+
+    return this
+  }
+
+  /**
+   * Validate the command line input against the definition.
+   *
+   * @returns {ArgvInput}
+   *
+   * @throws
+   */
+  public validate (): this {
+    // TODO
+
+    return this
   }
 
   /**

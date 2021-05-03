@@ -1,6 +1,5 @@
 'use strict'
 
-import Map from '@supercharge/map'
 import { Application } from './application'
 import { ArgvInput } from './input/argv-input'
 import { tap, upon } from '@supercharge/goodies'
@@ -10,15 +9,14 @@ import { CommandContract } from './command-contract'
 import { InputArgument } from './input/input-argument'
 import { InputArgumentBuilder } from './input/input-argument-builder'
 import { InputOptionBuilder } from './input/input-option-builder'
+import { InputDefinition } from './input/input-definition'
 
 interface CommandMeta {
   name: string
   description: string | undefined
   application?: Application
 
-  options: Map<string, InputOption>
-  parsedOptions: Map<string, unknown>
-  arguments: Map<string, InputArgument>
+  definition: InputDefinition
 
   output: ConsoleOutput
 }
@@ -39,10 +37,7 @@ export class Command implements CommandContract {
       name: name ?? this.constructor.name,
       description: undefined,
 
-      options: new Map(),
-      parsedOptions: new Map(),
-
-      arguments: new Map(),
+      definition: new InputDefinition(),
 
       output: new ConsoleOutput()
     }
@@ -119,6 +114,15 @@ export class Command implements CommandContract {
   }
 
   /**
+   * Returns the input definition containing all registered options and arguments.
+   *
+   * @returns {InputDefinition}
+   */
+  definition (): InputDefinition {
+    return this.meta.definition
+  }
+
+  /**
    * Determine whether this command is enabled. You may override this method in
    * your command and perform checks determining whether it should be enabled
    * or disabled in a given environment or under the given conditions.
@@ -141,15 +145,6 @@ export class Command implements CommandContract {
   }
 
   /**
-   * Returns the input arguments for this command.
-   *
-   * @returns {Map}
-   */
-  arguments (): Map<string, InputArgument> {
-    return this.meta.arguments
-  }
-
-  /**
    * Creates a new argument for the given `name` for this command. Returns a
    * builder instance to configure the added argument with fluent methods.
    *
@@ -165,19 +160,10 @@ export class Command implements CommandContract {
     }
 
     return upon(new InputArgument(name), argument => {
-      this.arguments().set(name, argument)
+      this.definition().addArgument(argument)
 
       return new InputArgumentBuilder(argument)
     })
-  }
-
-  /**
-   * Returns the input options for this command.
-   *
-   * @returns {Map}
-   */
-  options (): Map<string, InputOption> {
-    return this.meta.options
   }
 
   /**
@@ -196,7 +182,7 @@ export class Command implements CommandContract {
     }
 
     return upon(new InputOption(name), option => {
-      this.options().set(name, option)
+      this.definition().addOption(option)
 
       return new InputOptionBuilder(option)
     })
@@ -222,14 +208,6 @@ export class Command implements CommandContract {
       alias: this.optionsWithAliasMapping()
       // default: this.optionsWithDefaultValueMapping()
     })
-
-    console.log(parsed)
-
-    parsed.options().forEach((key: string, value: unknown) => {
-      this.meta.parsedOptions.set(key, value)
-    })
-
-    console.log(this.meta.parsedOptions)
 
     try {
       await this.run()
