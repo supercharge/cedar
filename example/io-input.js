@@ -8,16 +8,20 @@ async function run () {
   const name = await input.ask('What’s your name?', builder => {
     builder
       .defaultValue('Marcus')
-      .transform(value => Number(value))
+      .transform(value => String(value).toUpperCase())
   })
 
-  console.log({ name })
+  const age = await input.ask('What’s your age?', builder => {
+    builder
+      .defaultValue(123)
+      .transform(value => Number(value))
+  })
 
   const confirmed = await input.confirm('Proceed?', builder => {
     builder.defaultValue(true)
   })
 
-  console.log({ confirmed })
+  console.log({ name, age, confirmed })
 }
 
 run()
