@@ -204,10 +204,7 @@ export class Command implements CommandContract {
    * `handle` method must be implemented by subclasses.
    */
   async handle (argv: ArgvInput): Promise<any> {
-    const parsed = argv.parse({
-      alias: this.optionsWithAliasMapping()
-      // default: this.optionsWithDefaultValueMapping()
-    })
+    argv.bind(this.definition())
 
     try {
       await this.run()
@@ -215,26 +212,6 @@ export class Command implements CommandContract {
       this.prettyPrint(error)
     }
   }
-
-  private optionsWithAliasMapping (): { [key: string]: string[] } {
-    const result: { [key: string]: string[] } = {}
-
-    this.options().forEach((key: string, value: InputOption) => {
-      result[key] = value.shortcuts()
-    })
-
-    return result
-  }
-
-  // private optionsWithDefaultValueMapping (): { [key: string]: string[] } {
-  //   const result: { [key: string]: string[] } = {}
-
-  //   this.options().forEach((key: string, value: InputOption) => {
-  //     result[key] = value.defaultValue()
-  //   })
-
-  //   return result
-  // }
 
   /**
    * Pretty-print the given `error` in the terminal.

@@ -53,7 +53,7 @@ export class ArgvInput {
    *
    * @param definition
    */
-  public bind (definition: InputDefinition): this {
+  public bind (_definition: InputDefinition): this {
     // TODO
 
     return this
