@@ -206,23 +206,7 @@ export class Command implements CommandContract {
   async handle (argv: ArgvInput): Promise<any> {
     argv.bind(this.definition())
 
-    try {
-      await this.run()
-    } catch (error) {
-      this.prettyPrint(error)
-    }
-  }
-
-  /**
-   * Pretty-print the given `error` in the terminal.
-   *
-   * @param {Error} error
-   */
-  prettyPrint (error: Error): void {
-    this.io()
-      .emptyLine()
-      .error(error)
-      .emptyLine()
+    await this.run()
   }
 
   /**
@@ -231,6 +215,6 @@ export class Command implements CommandContract {
    * @returns {Promise}
    */
   run (): any | Promise<any> {
-    throw new Error(`You must implement the "handle" method in your "${this.getName()}" command`)
+    throw new Error(`You must implement the "run" method in your "${this.getName()}" command`)
   }
 }
