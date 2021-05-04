@@ -226,7 +226,7 @@ export class Application {
       return process.exit(exitCode)
     }
 
-    // TODO use console-io to log error
+    // TODO use console-io to pretty-log the error
     console.log(`\n${kleur.bgRed().white().bold(' ERROR ')}  ${error.message}\n`)
 
     return process.exit(exitCode)
