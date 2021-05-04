@@ -40,6 +40,18 @@ export class InputDefinition {
   }
 
   /**
+   * Returns the input option instance for the given `name`. Returns
+   * `undefined` if no input option is defined for the name.
+   *
+   * @returns {InputOption}
+   */
+  option (name: string): InputOption | undefined {
+    return this.options().find(option => {
+      return option.name() === name
+    })
+  }
+
+  /**
    * Creates a new argument for the given `name` for this command. Returns a
    * builder instance to configure the added argument with fluent methods.
    *
@@ -67,6 +79,13 @@ export class InputDefinition {
     })
   }
 
+  /**
+   * Determine whether an option with the given `name` exists.
+   *
+   * @param name
+   *
+   * @returns {Boolean}
+   */
   hasOption (name: string | number): boolean {
     if (Number.isInteger(name)) {
       return !!this.options().toArray()[name as number]
@@ -78,12 +97,35 @@ export class InputDefinition {
   }
 
   /**
+   * Determine whether an option with the given `name` does not exist.
+   *
+   * @param name
+   *
+   * @returns {Boolean}
+   */
+  isMissingOption (name: string | number): boolean {
+    return !this.hasOption(name)
+  }
+
+  /**
    * Returns the defined input arguments.
    *
    * @returns {Map}
    */
   arguments (): Set<InputArgument> {
     return this.meta.arguments
+  }
+
+  /**
+   * Returns the input argument instance for the given `name`. Returns
+   * `undefined` if no input argument is defined for the name.
+   *
+   * @returns {InputOption}
+   */
+  argument (name: string): InputArgument | undefined {
+    return this.arguments().find(argument => {
+      return argument.name() === name
+    })
   }
 
   /**
@@ -114,5 +156,9 @@ export class InputDefinition {
     return this.arguments().includes(argument => {
       return argument.name() === name
     })
+  }
+
+  isMissingArgument (name: string | number): boolean {
+    return !this.hasArgument(name)
   }
 }
