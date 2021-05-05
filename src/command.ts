@@ -154,16 +154,24 @@ export class Command implements CommandContract {
    *
    * @throws
    */
-  addArgument (name: string): InputArgumentBuilder {
+  addArgument (name: string): InputArgumentBuilder
+  addArgument (name: string, callback: (builder: InputArgumentBuilder) => void): Command
+  addArgument (name: string, callback?: any): any {
     if (!name) {
       throw new Error(`Missing argument name in command ${this.constructor.name}`)
     }
 
-    return upon(new InputArgument(name), argument => {
-      this.definition().addArgument(argument)
+    const argument = new InputArgument(name)
+    this.definition().addArgument(argument)
 
-      return new InputArgumentBuilder(argument)
-    })
+    const builder = new InputArgumentBuilder(argument)
+
+    if (typeof callback === 'function') {
+      callback(builder)
+      return this
+    }
+
+    return builder
   }
 
   /**
