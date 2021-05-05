@@ -10,7 +10,15 @@ class HelloCommand extends Command {
   configure () {
     this.description('Say hello')
 
-    this.addArgument('name').description('The name to greet.').defaultValue('Marcus').required()
+    this
+      // either use an argument builder
+      //   the argument builer is available as an argument to a callback provided as a second parameter
+      .addArgument('name', builder => {
+        builder.description('The name to greet.').defaultValue('Marcus').required()
+      })
+      // or the fluent interface
+      //   the fluent interface is available when not providing the builder callback
+      .addArgument('title').description('Your scientific title').optional()
 
     this.addOption('random').shortcuts('r').description('random')
   }
