@@ -116,9 +116,15 @@ export class InputDefinition {
    * Returns the input argument instance for the given `name`. Returns
    * `undefined` if no input argument is defined for the name.
    *
+   * @param {String|Number} name
+   *
    * @returns {InputArgument|undefined}
    */
-  argument (name: string): InputArgument | undefined {
+  argument (name: string | number): InputArgument | undefined {
+    if (Number.isInteger(name)) {
+      return this.arguments().at(name as number)
+    }
+
     return this.arguments().find(argument => {
       return argument.name() === name
     })
@@ -154,15 +160,16 @@ export class InputDefinition {
    * @returns {Boolean}
    */
   hasArgument (name: string | number): boolean {
-    if (Number.isInteger(name)) {
-      return !!this.arguments().toArray()[name as number]
-    }
-
-    return this.arguments().includes(argument => {
-      return argument.name() === name
-    })
+    return !!this.argument(name)
   }
 
+  /**
+   * Determine whether an argument for the given `name` does not exist.
+   *
+   * @param {String|Number} name
+   *
+   * @returns {Boolean}
+   */
   isMissingArgument (name: string | number): boolean {
     return !this.hasArgument(name)
   }
