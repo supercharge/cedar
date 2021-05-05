@@ -82,15 +82,11 @@ export class InputDefinition {
   /**
    * Determine whether an option with the given `name` exists.
    *
-   * @param name
+   * @param {String} name
    *
    * @returns {Boolean}
    */
-  hasOption (name: string | number): boolean {
-    if (Number.isInteger(name)) {
-      return !!this.options().toArray()[name as number]
-    }
-
+  hasOption (name: string): boolean {
     return this.options().includes(option => {
       return option.name() === name
     })
@@ -99,11 +95,11 @@ export class InputDefinition {
   /**
    * Determine whether an option with the given `name` does not exist.
    *
-   * @param name
+   * @param {String} name
    *
    * @returns {Boolean}
    */
-  isMissingOption (name: string | number): boolean {
+  isMissingOption (name: string): boolean {
     return !this.hasOption(name)
   }
 
@@ -120,7 +116,7 @@ export class InputDefinition {
    * Returns the input argument instance for the given `name`. Returns
    * `undefined` if no input argument is defined for the name.
    *
-   * @returns {InputOption}
+   * @returns {InputArgument|undefined}
    */
   argument (name: string): InputArgument | undefined {
     return this.arguments().find(argument => {
@@ -134,13 +130,13 @@ export class InputDefinition {
    *
    * @param {String} name
    *
-   * @returns {InputArgumentBuilder}
+   * @returns {InputDefinition}
    *
    * @throws
    */
   addArgument (argument: InputArgument): this {
     if (this.hasArgument(argument.name())) {
-      throw new Error(`Option "${argument.name()}" is already registered.`)
+      throw new Error(`Argument "${argument.name()}" is already registered.`)
     }
 
     return tap(this, () => {
@@ -148,6 +144,15 @@ export class InputDefinition {
     })
   }
 
+  /**
+   * Determine whether an argument for the given `name` exists. The `name`
+   * can be the name’s argument or the argument’s position as a number.
+   * When using a number it represents the registration position.
+   *
+   * @param {String|Number} name
+   *
+   * @returns {Boolean}
+   */
   hasArgument (name: string | number): boolean {
     if (Number.isInteger(name)) {
       return !!this.arguments().toArray()[name as number]
