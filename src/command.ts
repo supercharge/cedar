@@ -7,9 +7,9 @@ import { InputOption } from './input/input-option'
 import { ConsoleOutput } from './io/console-output'
 import { CommandContract } from './command-contract'
 import { InputArgument } from './input/input-argument'
-import { InputArgumentBuilder } from './input/input-argument-builder'
-import { InputOptionBuilder } from './input/input-option-builder'
 import { InputDefinition } from './input/input-definition'
+import { InputOptionBuilder } from './input/input-option-builder'
+import { InputArgumentBuilder } from './input/input-argument-builder'
 
 interface CommandMeta {
   name: string
@@ -212,6 +212,7 @@ export class Command implements CommandContract {
    * `handle` method must be implemented by subclasses.
    */
   async handle (argv: ArgvInput): Promise<any> {
+    // TODO bind the terminal input against the command definition (options, arguments)
     argv.bind(this.definition())
 
     await this.run()
