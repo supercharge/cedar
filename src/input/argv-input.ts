@@ -2,7 +2,7 @@
 
 import { Input } from './input'
 import { tap } from '@supercharge/goodies'
-import minimist, { ParsedArgs, Opts as Options } from 'minimist'
+import minimist, { ParsedArgs, Opts as ParseOptions } from 'minimist'
 
 export class ArgvInput extends Input {
   /**
@@ -30,15 +30,10 @@ export class ArgvInput extends Input {
   /**
    * Parse the command line input (arguments and options).
    */
-  parse (options?: Options): this {
+  parse (options?: ParseOptions): this {
     return tap(this, () => {
       this.parsed = minimist(this.args, options ?? {})
-      this.assignParsedInput()
     })
-  }
-
-  private assignParsedInput (): void {
-    // TODO
   }
 
   /**
