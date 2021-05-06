@@ -4,36 +4,58 @@ const Crypto = require('crypto')
 const { Command } = require('../dist')
 
 class HelloCommand extends Command {
-  getName () {
-    return 'hello'
-  }
-
+  /**
+   * Configure this command by defining input arguments and options.
+   */
   configure () {
-    this.description('Say hello')
-
     this
-      // either use an argument builder
-      //   the argument builer is available as an argument to a callback provided as a second parameter
+      .name('hello')
+      .description('Say hello')
+
+      /**
+       * either use an argument builder
+       * the argument builer is available as an argument to a callback provided as a second parameter
+       */
       .addArgument('name', builder => {
-        builder.description('The name to greet.').defaultValue('Marcus').required()
+        builder.description('The name to greet.').optional()
       })
-      // or the fluent interface
-      //   the fluent interface is available when not providing the builder callback
+
+      /**
+       * or the fluent interface
+       * the fluent interface is available when not providing the builder callback
+       */
       .addArgument('title').description('Your scientific title').optional()
 
-    this.addOption('random').shortcuts('r').description('random')
+    this
+      .addOption('random').shortcuts('r').description('random')
   }
 
+  /**
+   * Process the console command.
+   */
   async run () {
-    const name = this.options().get('random')
-      ? this.randomName()
-      : this.arguments().get('name')
+    const title = this.argument('title') ?? ''
 
-    console.log(`Hello ${name}`)
+    const name = this.option('random')
+      ? this.randomName()
+      : this.argument('name')
+
+    const message = title
+      ? `${title} ${name}`
+      : `${name}`
+
+    this.io()
+      .emptyLine()
+      .success(' Hello ', message)
   }
 
+  /**
+   * Returns a randomly generated name.
+   *
+   * @returns {String}
+   */
   randomName () {
-    return Crypto.randomBytes(32).toString('hex').slice(0, 10)
+    return Crypto.randomBytes(32).toString('hex').slice(0, 4)
   }
 }
 
