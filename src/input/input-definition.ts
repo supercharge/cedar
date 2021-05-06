@@ -173,4 +173,15 @@ export class InputDefinition {
   isMissingArgument (name: string | number): boolean {
     return !this.hasArgument(name)
   }
+
+  /**
+   * Returns the defined input arguments.
+   *
+   * @returns {String[]}
+   */
+  argumentNames (): string[] {
+    return this.arguments().map(argument => {
+      return argument.name()
+    }).toArray()
+  }
 }
