@@ -1,5 +1,6 @@
 'use strict'
 
+const Crypto = require('crypto')
 const { Command } = require('../dist')
 
 class HelloCommand extends Command {
@@ -25,10 +26,14 @@ class HelloCommand extends Command {
 
   async run () {
     const name = this.options().get('random')
-      ? 'Marcus'
+      ? this.randomName()
       : this.arguments().get('name')
 
     console.log(`Hello ${name}`)
+  }
+
+  randomName () {
+    return Crypto.randomBytes(32).toString('hex').slice(0, 10)
   }
 }
 
