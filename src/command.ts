@@ -1,5 +1,6 @@
 'use strict'
 
+import Map from '@supercharge/map'
 import { Application } from './application'
 import { ArgvInput } from './input/argv-input'
 import { tap, upon } from '@supercharge/goodies'
@@ -17,6 +18,8 @@ interface CommandMeta {
   application?: Application
 
   definition: InputDefinition
+  arguments: Map<string, unknown>
+  options: Map<string, unknown>
 
   output: ConsoleOutput
 }
@@ -38,6 +41,8 @@ export class Command implements CommandContract {
       description: undefined,
 
       definition: new InputDefinition(),
+      arguments: new Map(),
+      options: new Map(),
 
       output: new ConsoleOutput()
     }
@@ -174,6 +179,20 @@ export class Command implements CommandContract {
     return builder
   }
 
+  arguments (): Map<string, unknown> {
+    return this.meta.arguments
+  }
+
+  options (): Map<string, unknown> {
+    return this.meta.options
+  }
+
+  option (name: string): unknown {
+    return this.options().has(name)
+      ? this.options().get(name)
+      : this.definition().option(name)?.defaultValue()
+  }
+
   /**
    * Creates a new argument for the given `name` for this command. Returns a
    * builder instance to configure the added argument with fluent methods.
@@ -212,10 +231,64 @@ export class Command implements CommandContract {
    * `handle` method must be implemented by subclasses.
    */
   async handle (argv: ArgvInput): Promise<any> {
-    // TODO bind the terminal input against the command definition (options, arguments)
-    argv.bind(this.definition())
+    this.bind(argv)
 
     await this.run()
+  }
+
+  private bind (argv: ArgvInput): void {
+    // TODO bind the terminal input against the command definition (options, arguments)
+    this
+      .assignArgumentsAndOptions(argv)
+      .validate(argv)
+  }
+
+  protected assignArgumentsAndOptions (argv: ArgvInput): this {
+    return this
+      .assignArgumentsFrom(argv)
+      .assignOptionsFrom(argv)
+  }
+
+  protected assignArgumentsFrom (argv: ArgvInput): this {
+    argv.arguments().forEach((argument, index) => {
+      // if the command is expecting another argument: add it
+      if (this.definition().hasArgument(index)) {
+        const arg = this.definition().argument(index)
+
+        return this.arguments().set(arg?.name() as string, argument)
+      }
+
+      throw new Error(`Unexpected argument at position ${index}`)
+    })
+
+    return this
+  }
+
+  protected assignOptionsFrom (argv: ArgvInput): this {
+    argv.options().forEach((name, value) => {
+      // if the command is expecting another argument: add it
+      if (this.definition().hasOption(name)) {
+        return this.options().set(name, value)
+      }
+
+      throw new Error(`Unexpected option ${name} in command ${this.constructor.name}`)
+    })
+
+    return this
+  }
+
+  /**
+   * Validate the provided arguments and options (command line input)
+   * against the input definition configured for this command.
+   *
+   * @returns {Command}
+   *
+   * @throws
+   */
+  private validate (_argv: ArgvInput): this {
+    // TODO
+
+    return this
   }
 
   /**
