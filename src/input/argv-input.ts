@@ -33,6 +33,20 @@ export class ArgvInput extends Input {
   parse (options?: ParseOptions): this {
     return tap(this, () => {
       this.parsed = minimist(this.args, options ?? {})
+      this.assignParsedInput()
+    })
+  }
+
+  /**
+   * Assign the parsed arguments and options.
+   */
+  private assignParsedInput (): void {
+    const { _: args, ...options } = this.parsed
+
+    this.arguments().push(...args.slice(1))
+
+    Object.entries(options).forEach(([name, value]) => {
+      this.options().set(name, value)
     })
   }
 
