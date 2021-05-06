@@ -183,14 +183,24 @@ export class Command implements CommandContract {
     return this.meta.arguments
   }
 
+  argument (name: string): unknown {
+    if (this.definition().isMissingArgument(name)) {
+      throw new Error(`The argument "${name}" does not exist in command "${this.constructor.name}"`)
+    }
+
+    return this.arguments().get(name) ?? this.definition().argument(name)?.defaultValue()
+  }
+
   options (): Map<string, unknown> {
     return this.meta.options
   }
 
   option (name: string): unknown {
-    return this.options().has(name)
-      ? this.options().get(name)
-      : this.definition().option(name)?.defaultValue()
+    if (this.definition().isMissingOption(name)) {
+      throw new Error(`The option "${name}" does not exist in command "${this.constructor.name}"`)
+    }
+
+    return this.options().get(name) ?? this.definition().option(name)?.defaultValue()
   }
 
   /**
@@ -231,25 +241,45 @@ export class Command implements CommandContract {
    * `handle` method must be implemented by subclasses.
    */
   async handle (argv: ArgvInput): Promise<any> {
-    this.bind(argv)
-
-    await this.run()
+    await this
+      .bind(argv)
+      .run()
   }
 
-  private bind (argv: ArgvInput): void {
-    // TODO bind the terminal input against the command definition (options, arguments)
-    this
+  /**
+   * Bind the command definition against the `argv` input values.
+   *
+   * @param argv
+   *
+   * @returns {ThisType}
+   */
+  private bind (argv: ArgvInput): this {
+    return this
       .assignArgumentsAndOptions(argv)
       .validate(argv)
   }
 
-  protected assignArgumentsAndOptions (argv: ArgvInput): this {
+  /**
+   * Assign the input values from `argv` to the argument and option definitions.
+   *
+   * @param argv
+   *
+   * @returns {ThisType}
+   */
+  private assignArgumentsAndOptions (argv: ArgvInput): this {
     return this
       .assignArgumentsFrom(argv)
       .assignOptionsFrom(argv)
   }
 
-  protected assignArgumentsFrom (argv: ArgvInput): this {
+  /**
+   * Assign the input values from `argv` to the defined arguments.
+   *
+   * @param argv
+   *
+   * @returns {ThisType}
+   */
+  private assignArgumentsFrom (argv: ArgvInput): this {
     argv.arguments().forEach((argument, index) => {
       // if the command is expecting another argument: add it
       if (this.definition().hasArgument(index)) {
@@ -258,15 +288,32 @@ export class Command implements CommandContract {
         return this.arguments().set(arg?.name() as string, argument)
       }
 
-      throw new Error(`Unexpected argument at position ${index}`)
+      // too many arguments provided
+      if (this.definition().arguments().size()) {
+        throw new Error(`Too many arguments in command ${this.constructor.name}: expected arguments "${
+          this.definition().argumentNames().join(', ')
+        }"`)
+      }
+
+      throw new Error(`No arguments expected in command ${this.constructor.name}`)
     })
 
     return this
   }
 
-  protected assignOptionsFrom (argv: ArgvInput): this {
+  /**
+   * Assign the input values from `argv` to the defined options.
+   *
+   * @param argv
+   *
+   * @returns {ThisType}
+   */
+  private assignOptionsFrom (argv: ArgvInput): this {
     argv.options().forEach((name, value) => {
-      // if the command is expecting another argument: add it
+      if (this.definition().hasShortcut(name)) {
+        return this.options().set(name, value)
+      }
+
       if (this.definition().hasOption(name)) {
         return this.options().set(name, value)
       }
@@ -286,7 +333,15 @@ export class Command implements CommandContract {
    * @throws
    */
   private validate (_argv: ArgvInput): this {
-    // TODO
+    const missingArguments = this.definition().argumentNames().filter(argument => {
+      return this.arguments().missing(argument) && this.definition().argument(argument)?.isRequired()
+    })
+
+    if (missingArguments.length > 0) {
+      throw new Error(`Not enough arguments provided in command ${this.constructor.name}. Missing: ${
+        missingArguments.join(', ')
+      }`)
+    }
 
     return this
   }
