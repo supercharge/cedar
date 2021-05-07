@@ -96,14 +96,12 @@ export class InputOption {
    * @returns {InputOption}
    */
   addShortcuts (shortcuts: string | string[]): this {
-    const test = this.meta.shortcuts
-      .concat(shortcuts || [])
-      .map(shortcut => {
-        return String(shortcut).trim()
-      })
-
     return tap(this, () => {
-      this.meta.shortcuts = test
+      this.meta.shortcuts = this.meta.shortcuts
+        .concat(shortcuts || [])
+        .map(shortcut => {
+          return String(shortcut).trim()
+        })
     })
   }
 
