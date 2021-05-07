@@ -5,6 +5,7 @@ import { Command } from './command'
 import { tap } from '@supercharge/goodies'
 import { ArgvInput } from './input/argv-input'
 import { ListCommands } from './command/list-command'
+import { ConsoleOutput } from './io/console-output'
 
 interface ApplicationMeta {
   /**
@@ -26,6 +27,11 @@ interface ApplicationMeta {
    * The default command to run on empty input.
    */
   defaultCommand: Command
+
+  /**
+   * The default command to run on empty input.
+   */
+  output: ConsoleOutput
 }
 
 export class Application {
@@ -43,6 +49,7 @@ export class Application {
     this.meta = {
       name,
       commands: [],
+      output: new ConsoleOutput(),
       defaultCommand: new ListCommands().setApplication(this)
     }
   }
@@ -98,6 +105,15 @@ export class Application {
    */
   commands (): Command[] {
     return this.meta.commands
+  }
+
+  /**
+   * Returns the console output instance.
+   *
+   * @returns {ConsoleOutput}
+   */
+  output (): ConsoleOutput {
+    return this.meta.output
   }
 
   /**
@@ -219,6 +235,13 @@ export class Application {
     }
   }
 
+  /**
+   * Termine the application. Exits the process with exit code `0` if the `error`
+   * is empty. In case an error happened, the error will be logged to the
+   * console and the process exits with status code `1`.
+   *
+   * @param {Error} error
+   */
   private async terminate (error?: Error): Promise<void> {
     const exitCode = error ? 1 : 0
 
@@ -226,8 +249,7 @@ export class Application {
       return process.exit(exitCode)
     }
 
-    // TODO use console-io to pretty-log the error
-    console.log(`\n${kleur.bgRed().white().bold(' ERROR ')}  ${error.message}\n`)
+    this.output().error(error)
 
     return process.exit(exitCode)
   }
