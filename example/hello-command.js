@@ -1,6 +1,5 @@
 'use strict'
 
-const Crypto = require('crypto')
 const { Command } = require('../dist')
 
 class HelloCommand extends Command {
@@ -17,7 +16,7 @@ class HelloCommand extends Command {
        * the argument builer is available as an argument to a callback provided as a second parameter
        */
       .addArgument('name', builder => {
-        builder.description('The name to greet.').optional()
+        builder.description('The name to greet.').required()
       })
 
       /**
@@ -27,18 +26,18 @@ class HelloCommand extends Command {
       .addArgument('title').description('Your scientific title').optional()
 
     this
-      .addOption('random').shortcuts('r').description('random')
+      .addOption('random-title').shortcuts('r').description('generate a random title if none is present')
   }
 
   /**
    * Process the console command.
    */
   async run () {
-    const title = this.argument('title') ?? ''
+    const title = this.option('random-title')
+      ? this.randomTitle()
+      : this.argument('title') ?? ''
 
-    const name = this.option('random')
-      ? this.randomName()
-      : this.argument('name')
+    const name = this.argument('name')
 
     const message = title
       ? `${title} ${name}`
@@ -54,8 +53,12 @@ class HelloCommand extends Command {
    *
    * @returns {String}
    */
-  randomName () {
-    return Crypto.randomBytes(32).toString('hex').slice(0, 4)
+  randomTitle () {
+    const titles = ['Mr.', 'Mrs.', 'Bro', 'Dude']
+
+    return titles[
+      Math.floor(Math.random() * titles.length)
+    ]
   }
 }
 
