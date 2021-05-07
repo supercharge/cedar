@@ -7,7 +7,7 @@ export class BaseBuilder {
   /**
    * The prompt configuration object.
    */
-  private readonly promptBuilder: PromptBuilder
+  protected readonly promptBuilder: PromptBuilder
 
   /**
    * Create a new question builder instance.
