@@ -3,34 +3,73 @@
 import { ConsoleOutput } from './console-output'
 
 export class Tag {
-  private readonly io: ConsoleOutput
+  /**
+   * The console output instance.
+   */
+  private readonly output: ConsoleOutput
+
+  /**
+   * The tag’s label.
+   */
   private readonly label: string
 
   /**
    * Create a new instance.
    */
-  constructor (io: ConsoleOutput, label: string) {
-    this.io = io
+  constructor (output: ConsoleOutput, label: string) {
     this.label = label
+    this.output = output
   }
 
+  /**
+   * Prints a succeess `message` to the console for the assigned tag.
+   *
+   * @param {String} message
+   * @param {String} reason
+   *
+   * @returns {ConsoleOutput}
+   */
   success (message: string): ConsoleOutput {
-    return this.io.success(this.label, message)
+    return this.output.success(this.label, message)
   }
 
-  skipped (message: string, reason?: string): ConsoleOutput {
-    return this.io.hint(this.label, `${message} ${this.formatReason(reason)}`)
+  /**
+   * Prints an info `message` to the console for the assigned tag and the optional `reason`.
+   *
+   * @param {String} message
+   * @param {String} reason
+   *
+   * @returns {ConsoleOutput}
+   */
+  info (message: string, reason?: string): ConsoleOutput {
+    return this.output.hint(this.label, `${message}${this.formatReason(reason)}`)
   }
 
+  /**
+   * Prints a fail `message` to the console for the assigned tag and the optional `reason`.
+   *
+   * @param {String} message
+   * @param {String} reason
+   *
+   * @returns {ConsoleOutput}
+   */
   failed (message: string, reason?: string): ConsoleOutput {
-    return this.io.fail(this.label, `${message} ${this.formatReason(reason)}`)
+    return this.output.fail(this.label, `${message}${this.formatReason(reason)}`)
   }
 
+  /**
+   * Returns a color-formatted string of the given `reason`.
+   * Returns an empty if no reason is provided.
+   *
+   * @param {String} reason
+   *
+   * @returns {String}
+   */
   private formatReason (reason?: string): string {
     if (!reason) {
       return ''
     }
 
-    return `: ${this.io.colors().dim(reason)}`
+    return `: ${this.output.colors().dim(reason)}`
   }
 }
