@@ -87,9 +87,7 @@ export class InputDefinition {
    * @returns {Boolean}
    */
   hasOption (name: string): boolean {
-    return this.options().includes(option => {
-      return option.name() === name
-    })
+    return !!this.option(name)
   }
 
   /**
@@ -101,6 +99,29 @@ export class InputDefinition {
    */
   isMissingOption (name: string): boolean {
     return !this.hasOption(name)
+  }
+
+  /**
+   * Returns the input option instance for the given `name`. Returns
+   * `undefined` if no input option is defined for the name.
+   *
+   * @returns {InputOption}
+   */
+  optionByShortcut (name: string): InputOption | undefined {
+    return this.options().find(option => {
+      return option.shortcuts().includes(name)
+    })
+  }
+
+  /**
+   * Determine whether an option with the given `name` does not exist.
+   *
+   * @param {String} name
+   *
+   * @returns {Boolean}
+   */
+  hasOptionShortcut (name: string): boolean {
+    return !!this.optionByShortcut(name)
   }
 
   /**
