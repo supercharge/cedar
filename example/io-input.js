@@ -21,7 +21,33 @@ async function run () {
     builder.defaultValue(true)
   })
 
-  console.log({ name, age, confirmed })
+  const choice = await input.choice('What color do you like?', [
+    {
+      title: 'Marcus', value: 'marcus', disabled: true
+    },
+    {
+      title: 'Norman', value: 'norman', description: 'this dude ey'
+    },
+    {
+      title: 'Christian', value: 'christian'
+    }
+
+    // fluent interface idea:
+    // choice.add('Norman').value('norman').description('this dude ey!')
+    // choice.add('Christian').value('christian')
+  ])
+
+  const password = await input.password('Enter your password', builder => {
+    builder.defaultValue('tester')
+  })
+
+  const passwordRepeat = await input.password('Repeat your password (will not be not visible)', builder => {
+    builder.defaultValue('tester').invisible()
+  })
+
+  const secret = await input.secure('Enter your secret token')
+
+  console.log({ name, age, confirmed, choice, password, passwordRepeat, secret })
 }
 
 run()
