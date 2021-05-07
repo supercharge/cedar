@@ -161,7 +161,7 @@ export class ConsoleOutput {
    */
   warn (message: string): this {
     if (typeof message === 'string') {
-      return this.log(`${this.colors().bgYellow().black(' WARN ')}  ${this.colors().yellow(message)}`)
+      return this.log(`${this.colors().bgYellow().black(' WARN ')}  ${message}`)
     }
 
     throw new Error(`Unsupported input when logging a warning message. Received: ${typeof message}`)
