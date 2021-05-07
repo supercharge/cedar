@@ -16,7 +16,7 @@ async function run () {
     })
     .register('work', command => {
       command.description('Do the work.')
-      command.handle = () => {
+      command.run = () => {
         throw new Error('This does not work!')
       }
     })
