@@ -1,9 +1,10 @@
 'use strict'
 
-import Prompt from 'prompts'
+import Prompt, { Choice } from 'prompts'
 import { PromptBuilder } from './builder/prompt'
 import { ConfirmBuilder } from './builder/confirm'
 import { QuestionBuilder } from './builder/question'
+import { SecureInputBuilder } from './builder/secure'
 
 export class ConsoleInput {
   /**
@@ -16,16 +17,13 @@ export class ConsoleInput {
   async ask<T extends string> (question: string, callback: (questionBuilder: QuestionBuilder) => unknown): Promise<T> {
     const builder = new PromptBuilder()
       .type('text')
-      .name('value')
       .question(question)
 
     if (callback) {
       callback(new QuestionBuilder(builder))
     }
 
-    const result = await Prompt(builder.build())
-
-    return result.value
+    return await this.prompt(builder)
   }
 
   /**
@@ -39,16 +37,13 @@ export class ConsoleInput {
   async confirm (question: string, callback: (confirmBuilder: ConfirmBuilder) => unknown): Promise<boolean> {
     const builder = new PromptBuilder()
       .type('confirm')
-      .name('value')
       .question(question)
 
     if (callback) {
       callback(new ConfirmBuilder(builder))
     }
 
-    const result = await Prompt(builder.build())
-
-    return result.value
+    return await this.prompt(builder)
   }
 
   /**
@@ -57,11 +52,24 @@ export class ConsoleInput {
    * @param {String} question
    * @param  {Choice[]} choices
    *
-   * @returns {Choice}
+   * @returns {String}
    */
-  async choice (_question: string, _choices: string[]): Promise<string> {
-    //
-    return ''
+  // async choice (question: string, callback: (choiceBuilder: ChoiceBuilder) => unknown): Promise<string> {
+  async choice (question: string, choices: Choice[]): Promise<string> {
+    const builder = new PromptBuilder()
+      .type('select')
+      .question(question)
+      .choices(choices)
+
+    // if (callback) {
+    //   callback(new ChoiceBuilder(builder))
+
+    //   if (!builder.hasChoices()) {
+    //     throw new Error('You must provide at least one option to select from.')
+    //   }
+    // }
+
+    return await this.prompt(builder)
   }
 
   /**
@@ -72,8 +80,32 @@ export class ConsoleInput {
    *
    * @returns  {Result}
    */
-  async secure (_question: string): Promise<string> {
-    return ''
+  async password (question: string, callback: (secureInputBuilder: SecureInputBuilder) => unknown): Promise<string> {
+    const builder = new PromptBuilder()
+      .type('password')
+      .question(question)
+
+    if (callback) {
+      callback(new SecureInputBuilder(builder))
+    }
+
+    return await this.prompt(builder)
+  }
+
+  /**
+   * Ask the user for sensitive input that will not be visible when typing in the terminal.
+   * This prompt behaves like `sude` where the input is invisible while typing.
+   *
+   * @param {String} question
+   *
+   * @returns  {Result}
+   */
+  async secure (question: string): Promise<string> {
+    const builder = new PromptBuilder()
+      .type('invisible')
+      .question(question)
+
+    return await this.prompt(builder)
   }
 
   /**
@@ -81,5 +113,18 @@ export class ConsoleInput {
    */
   async progress (): Promise<any> {
     //
+  }
+
+  /**
+   *
+   * @param builder
+   * @returns
+   */
+  private async prompt<R>(builder: PromptBuilder): Promise<R> {
+    const result = await Prompt(
+      builder.name('value').build()
+    )
+
+    return result.value
   }
 }
