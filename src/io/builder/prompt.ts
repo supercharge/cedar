@@ -1,7 +1,7 @@
 'use strict'
 
 import { tap } from '@supercharge/goodies'
-import { PromptObject, PromptType } from 'prompts'
+import { Choice, PromptObject, PromptType } from 'prompts'
 
 export class PromptBuilder {
   /**
@@ -71,6 +71,19 @@ export class PromptBuilder {
   public transform (transformer: (value: unknown) => any): this {
     return tap(this, () => {
       this.prompt.format = transformer
+    })
+  }
+
+  /**
+   * Set the prompt message to the given `question`.
+   *
+   * @param {String} question
+   *
+   * @returns {PromptBuilder}
+   */
+  public choices (choices: Choice[]): this {
+    return tap(this, () => {
+      this.prompt.choices = choices
     })
   }
 
