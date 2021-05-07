@@ -179,10 +179,25 @@ export class Command implements CommandContract {
     return builder
   }
 
-  arguments (): Map<string, unknown> {
+  /**
+   * Returns a map of key-value pairs of input arguments. This represents the merged
+   * input definition from the configured arguments and the actual terminal input
+   * provided by the user.
+   *
+   * @returns {Map}
+   */
+  private arguments (): Map<string, unknown> {
     return this.meta.arguments
   }
 
+  /**
+   * Returns the argument value for the argument identified by `name`. Throws an
+   * error if no argument with the given `name` is defined in this command.
+   *
+   * @param {String} name
+   *
+   * @returns {*}
+   */
   argument (name: string): unknown {
     if (this.definition().isMissingArgument(name)) {
       throw new Error(`The argument "${name}" does not exist in command "${this.constructor.name}"`)
@@ -191,10 +206,25 @@ export class Command implements CommandContract {
     return this.arguments().get(name) ?? this.definition().argument(name)?.defaultValue()
   }
 
-  options (): Map<string, unknown> {
+  /**
+   * Returns a map of key-value pairs of input options. This represents the merged
+   * input definition from the configured options and the actual terminal input
+   * provided by the user.
+   *
+   * @returns {Map}
+   */
+  private options (): Map<string, unknown> {
     return this.meta.options
   }
 
+  /**
+   * Returns the option value for the option identified by `name`. Throws an
+   * error if no option with the given `name` is defined in this command.
+   *
+   * @param {String} name
+   *
+   * @returns {*}
+   */
   option (name: string): unknown {
     if (this.definition().isMissingOption(name)) {
       throw new Error(`The option "${name}" does not exist in command "${this.constructor.name}"`)
@@ -310,15 +340,18 @@ export class Command implements CommandContract {
    */
   private assignOptionsFrom (argv: ArgvInput): this {
     argv.options().forEach((name, value) => {
-      if (this.definition().hasShortcut(name)) {
-        return this.options().set(name, value)
+      if (this.definition().hasOptionShortcut(name)) {
+        const option = this.definition().optionByShortcut(name)
+
+        return this.options().set(option?.name() as string, value
+        )
       }
 
       if (this.definition().hasOption(name)) {
         return this.options().set(name, value)
       }
 
-      throw new Error(`Unexpected option ${name} in command ${this.constructor.name}`)
+      throw new Error(`Unexpected option "${name}" in command ${this.constructor.name}`)
     })
 
     return this
