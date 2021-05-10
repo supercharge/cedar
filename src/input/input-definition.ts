@@ -23,10 +23,25 @@ export class InputDefinition {
    *
    * @param {String} name
    */
-  constructor () {
+  constructor (definition?: Array<InputArgument | InputOption>) {
     this.meta = {
       options: new Set(),
       arguments: new Set()
+    }
+
+    this.setDefinition(definition)
+  }
+
+  /**
+   * Assign the arguments and options from the given `definition`.
+   *
+   * @param definition
+   */
+  setDefinition (definition?: Array<InputArgument | InputOption>): void {
+    for (const input of definition ?? []) {
+      input instanceof InputOption
+        ? this.addOption(input)
+        : this.addArgument(input)
     }
   }
 

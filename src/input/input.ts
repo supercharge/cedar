@@ -2,15 +2,18 @@
 
 import Map from '@supercharge/map'
 import { tap } from '@supercharge/goodies'
-import { Opts as Options } from 'minimist'
+import { InputDefinition } from './input-definition'
 
 export abstract class Input {
   /**
    * The parsed input tokens.
    */
   private readonly meta: {
-    arguments: string[]
+    definition: InputDefinition
+
     options: Map<string, unknown>
+
+    arguments: Map<string, unknown>
   }
 
   /**
@@ -19,21 +22,75 @@ export abstract class Input {
   constructor () {
     this.meta = {
       options: new Map(),
-      arguments: []
+      arguments: new Map(),
+      definition: new InputDefinition()
     }
+  }
+
+  /**
+   * Returns the input definition.
+   *
+   * @returns {InputDefinition}
+   */
+  definition (): InputDefinition {
+    return this.meta.definition
+  }
+
+  /**
+   * Assign the given input `definition`.
+   *
+   * @param definition
+   *
+   * @returns {ThisType}
+   */
+  withDefinition (definition: InputDefinition): this {
+    return tap(this, () => {
+      this.meta.definition = definition
+    })
   }
 
   /**
    * Parse the command line input (arguments and options).
    */
-  abstract parse (options?: Options): this
+  abstract parse (): this
+
+  /**
+   * Bind the command definition against the `argv` input values.
+   *
+   * @param argv
+   *
+   * @returns {ThisType}
+   */
+  public bind (definition: InputDefinition): this {
+    return this.withDefinition(definition).parse().validate()
+  }
+
+  /**
+   * Validate the provided arguments and options (command line input)
+   * against the input definition configured for this command.
+   *
+   * @returns {Command}
+   *
+   * @throws
+   */
+  private validate (): this {
+    const missingArguments = this.definition().argumentNames().filter(argument => {
+      return this.arguments().missing(argument) && this.definition().argument(argument)?.isRequired()
+    })
+
+    if (missingArguments.length > 0) {
+      throw new Error(`Not enough arguments provided. Missing: ${missingArguments.join(', ')}`)
+    }
+
+    return this
+  }
 
   /**
    * Returns the provided input arguments.
    *
-   * @returns {String[]}
+   * @returns {Map}
    */
-  arguments (): string[] {
+  arguments (): Map<string, unknown> {
     return this.meta.arguments
   }
 

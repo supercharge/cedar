@@ -18,8 +18,7 @@ interface CommandMeta {
   application?: Application
 
   definition: InputDefinition
-  arguments: Map<string, unknown>
-  options: Map<string, unknown>
+  input: ArgvInput
 
   output: ConsoleOutput
 }
@@ -41,8 +40,7 @@ export class Command implements CommandContract {
       description: undefined,
 
       definition: new InputDefinition(),
-      arguments: new Map(),
-      options: new Map(),
+      input: new ArgvInput(),
 
       output: new ConsoleOutput()
     }
@@ -179,6 +177,36 @@ export class Command implements CommandContract {
     return builder
   }
 
+  private input (): ArgvInput {
+    if (!this.meta.input) {
+      throw new Error('Missing input')
+    }
+
+    return this.meta.input
+  }
+
+  /**
+   * Assign the given `argv` input to this command.
+   *
+   * @param argv
+   *
+   * @returns {ThisType}
+   */
+  private withInput (argv: ArgvInput): this {
+    return tap(this, () => {
+      argv.bind(this.definition())
+      this.meta.input = argv
+    })
+  }
+
+  mergeApplicationDefinition (): this {
+    this.application().definition().options().forEach(option => {
+      this.definition().addOption(option)
+    })
+
+    return this
+  }
+
   /**
    * Returns a map of key-value pairs of input arguments. This represents the merged
    * input definition from the configured arguments and the actual terminal input
@@ -187,7 +215,7 @@ export class Command implements CommandContract {
    * @returns {Map}
    */
   private arguments (): Map<string, unknown> {
-    return this.meta.arguments
+    return this.input().arguments()
   }
 
   /**
@@ -214,7 +242,7 @@ export class Command implements CommandContract {
    * @returns {Map}
    */
   private options (): Map<string, unknown> {
-    return this.meta.options
+    return this.input().options()
   }
 
   /**
@@ -271,112 +299,7 @@ export class Command implements CommandContract {
    * `handle` method must be implemented by subclasses.
    */
   async handle (argv: ArgvInput): Promise<any> {
-    await this
-      .bind(argv)
-      .run()
-  }
-
-  /**
-   * Bind the command definition against the `argv` input values.
-   *
-   * @param argv
-   *
-   * @returns {ThisType}
-   */
-  private bind (argv: ArgvInput): this {
-    return this
-      .assignArgumentsAndOptions(argv)
-      .validate(argv)
-  }
-
-  /**
-   * Assign the input values from `argv` to the argument and option definitions.
-   *
-   * @param argv
-   *
-   * @returns {ThisType}
-   */
-  private assignArgumentsAndOptions (argv: ArgvInput): this {
-    return this
-      .assignArgumentsFrom(argv)
-      .assignOptionsFrom(argv)
-  }
-
-  /**
-   * Assign the input values from `argv` to the defined arguments.
-   *
-   * @param argv
-   *
-   * @returns {ThisType}
-   */
-  private assignArgumentsFrom (argv: ArgvInput): this {
-    argv.arguments().forEach((argument, index) => {
-      // if the command is expecting another argument: add it
-      if (this.definition().hasArgument(index)) {
-        const arg = this.definition().argument(index)
-
-        return this.arguments().set(arg?.name() as string, argument)
-      }
-
-      // too many arguments provided
-      if (this.definition().arguments().size()) {
-        throw new Error(`Too many arguments in command ${this.constructor.name}: expected arguments "${
-          this.definition().argumentNames().join(', ')
-        }"`)
-      }
-
-      throw new Error(`No arguments expected in command ${this.constructor.name}`)
-    })
-
-    return this
-  }
-
-  /**
-   * Assign the input values from `argv` to the defined options.
-   *
-   * @param argv
-   *
-   * @returns {ThisType}
-   */
-  private assignOptionsFrom (argv: ArgvInput): this {
-    argv.options().forEach((name, value) => {
-      if (this.definition().hasOptionShortcut(name)) {
-        const option = this.definition().optionByShortcut(name)
-
-        return this.options().set(option?.name() as string, value
-        )
-      }
-
-      if (this.definition().hasOption(name)) {
-        return this.options().set(name, value)
-      }
-
-      throw new Error(`Unexpected option "${name}" in command ${this.constructor.name}`)
-    })
-
-    return this
-  }
-
-  /**
-   * Validate the provided arguments and options (command line input)
-   * against the input definition configured for this command.
-   *
-   * @returns {Command}
-   *
-   * @throws
-   */
-  private validate (_argv: ArgvInput): this {
-    const missingArguments = this.definition().argumentNames().filter(argument => {
-      return this.arguments().missing(argument) && this.definition().argument(argument)?.isRequired()
-    })
-
-    if (missingArguments.length > 0) {
-      throw new Error(`Not enough arguments provided in command ${this.constructor.name}. Missing: ${
-        missingArguments.join(', ')
-      }`)
-    }
-
-    return this
+    await this.mergeApplicationDefinition().withInput(argv).run()
   }
 
   /**

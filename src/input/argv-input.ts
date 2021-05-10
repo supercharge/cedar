@@ -43,11 +43,64 @@ export class ArgvInput extends Input {
   private assignParsedInput (): void {
     const { _: args, ...options } = this.parsed
 
-    this.arguments().push(...args.slice(1))
+    this
+      .assignArgumentsFrom(args.slice(1))
+      .assignOptionsFrom(options)
+  }
 
-    Object.entries(options).forEach(([name, value]) => {
-      this.options().set(name, value)
+  /**
+   * Assign the input values from `argv` to the defined arguments.
+   *
+   * @param argv
+   *
+   * @returns {ThisType}
+   */
+  private assignArgumentsFrom (args: string[]): this {
+    args.forEach((argument, index) => {
+      // add another argument if the command expects it
+      if (this.definition().hasArgument(index)) {
+        const arg = this.definition().argument(index)
+
+        return this.arguments().set(arg?.name() as string, argument)
+      }
+
+      // too many arguments provided
+      if (this.definition().arguments().size()) {
+        throw new Error(`Too many arguments in command ${this.constructor.name}: expected arguments "${
+          this.definition().argumentNames().join(', ')
+        }"`)
+      }
+
+      throw new Error(`No arguments expected in command ${this.constructor.name}`)
     })
+
+    return this
+  }
+
+  /**
+   * Assign the input values from `argv` to the defined options.
+   *
+   * @param argv
+   *
+   * @returns {ThisType}
+   */
+  private assignOptionsFrom (options: { [key: string]: unknown }): this {
+    Object.entries(options).forEach(([name, value]) => {
+      if (this.definition().hasOptionShortcut(name)) {
+        const option = this.definition().optionByShortcut(name)
+
+        return this.options().set(option?.name() as string, value
+        )
+      }
+
+      if (this.definition().hasOption(name)) {
+        return this.options().set(name, value)
+      }
+
+      throw new Error(`Unexpected option "${name}" in command ${this.constructor.name}`)
+    })
+
+    return this
   }
 
   /**

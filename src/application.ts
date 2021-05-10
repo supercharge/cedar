@@ -4,8 +4,12 @@ import kleur from 'kleur'
 import { Command } from './command'
 import { tap } from '@supercharge/goodies'
 import { ArgvInput } from './input/argv-input'
-import { ListCommands } from './command/list-command'
+import { InputOption } from './input/input-option'
 import { ConsoleOutput } from './io/console-output'
+import { HelpCommand } from './command/help-command'
+import { ListCommands } from './command/list-command'
+import { InputArgument } from './input/input-argument'
+import { InputDefinition } from './input/input-definition'
 
 interface ApplicationMeta {
   /**
@@ -32,6 +36,11 @@ interface ApplicationMeta {
    * The default command to run on empty input.
    */
   output: ConsoleOutput
+
+  /**
+   * The application’s input definition. Contains the `version` and `help` flags by default.
+   */
+  definition: InputDefinition
 }
 
 export class Application {
@@ -50,8 +59,31 @@ export class Application {
       name,
       commands: [],
       output: new ConsoleOutput(),
+      definition: this.defaultInputDefinition(),
       defaultCommand: new ListCommands().setApplication(this)
     }
+  }
+
+  /**
+   * Returns the application’s input definition, containing global flags for `version` and `help`.
+   *
+   * @returns {InputDefinition}
+   */
+  definition (): InputDefinition {
+    return this.meta.definition
+  }
+
+  /**
+   * Returns the default input definition for this application.
+   *
+   * @returns {InputDefinition}
+   */
+  defaultInputDefinition (): InputDefinition {
+    return new InputDefinition([
+      new InputArgument('command').setDescription('The command to run').markAsRequired(),
+      new InputOption('version').addShortcuts('v').setDescription('Print the application version to the terminal.'),
+      new InputOption('help').addShortcuts('h').setDescription('Display the help output for the given command or this application.')
+    ])
   }
 
   /**
@@ -178,9 +210,13 @@ export class Application {
    * @throws
    */
   async run (input?: string[]): Promise<void> {
-    const argv = new ArgvInput(input).parse({
-      alias: this.defaultAliases()
-    })
+    let argv = new ArgvInput(input)
+
+    try {
+      argv = argv.bind(this.definition())
+    } catch (error) {
+      // ignore error at this point. At this point, we want the command name
+    }
 
     if (argv.hasOption('version')) {
       return this.outputNameAndVersion()
@@ -193,8 +229,11 @@ export class Application {
     })
 
     try {
+      await this.showHelpWhenNecessaryFor(argv, command)
+
       if (command) {
         await command.handle(argv)
+
         return await this.terminate()
       }
 
@@ -206,6 +245,14 @@ export class Application {
       await this.terminate()
     } catch (error) {
       await this.terminate(error)
+    }
+  }
+
+  async showHelpWhenNecessaryFor (argv: ArgvInput, command?: Command): Promise<void> {
+    if (argv.hasOption('help')) {
+      await new HelpCommand().setApplication(this).forCommand(command).handle(argv)
+
+      return await this.terminate()
     }
   }
 
@@ -249,7 +296,7 @@ export class Application {
       return process.exit(exitCode)
     }
 
-    this.output().error(error)
+    this.output().emptyLine().error(error)
 
     return process.exit(exitCode)
   }
