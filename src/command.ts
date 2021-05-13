@@ -15,6 +15,7 @@ import { InputArgumentBuilder } from './input/input-argument-builder'
 interface CommandMeta {
   name: string
   description: string | undefined
+  ignoreValidationErrors: boolean
   application?: Application
 
   definition: InputDefinition
@@ -38,6 +39,7 @@ export class Command implements CommandContract {
     this.meta = {
       name: name ?? this.constructor.name,
       description: undefined,
+      ignoreValidationErrors: false,
 
       definition: new InputDefinition(),
       input: new ArgvInput(),
@@ -137,6 +139,37 @@ export class Command implements CommandContract {
   }
 
   /**
+   * Ignore validation errors when binding the terminal input to the arguments and
+   * options defined in the command. For example, this is useful in the help
+   * command because it can’t know argumentss and options of other commands.
+   *
+   * @returns {ThisType}
+   */
+  ignoreValidationErrors (): this {
+    return tap(this, () => {
+      this.meta.ignoreValidationErrors = true
+    })
+  }
+
+  /**
+   * Determine whether to ignore validation errors.
+   *
+   * @returns {Boolean}
+   */
+  shouldIgnoreValidationErrors (): boolean {
+    return this.meta.ignoreValidationErrors
+  }
+
+  /**
+   * Determine whether to **not ignore** validation errors.
+   *
+   * @returns {Boolean}
+   */
+  shouldThrowValidationErrors (): boolean {
+    return !this.shouldIgnoreValidationErrors()
+  }
+
+  /**
    * Configure the command.
    */
   configure (): void {
@@ -193,16 +226,13 @@ export class Command implements CommandContract {
    * @returns {ThisType}
    */
   private withInput (argv: ArgvInput): this {
-    return tap(this, () => {
-      argv.bind(this.definition())
-      this.meta.input = argv
-    })
-  }
-
-  mergeApplicationDefinition (): this {
-    this.application().definition().options().forEach(option => {
-      this.definition().addOption(option)
-    })
+    try {
+      this.meta.input = argv.bind(this.definition())
+    } catch (error) {
+      if (this.shouldThrowValidationErrors()) {
+        throw error
+      }
+    }
 
     return this
   }
@@ -299,7 +329,7 @@ export class Command implements CommandContract {
    * `handle` method must be implemented by subclasses.
    */
   async handle (argv: ArgvInput): Promise<any> {
-    await this.mergeApplicationDefinition().withInput(argv).run()
+    await this.withInput(argv).run()
   }
 
   /**
