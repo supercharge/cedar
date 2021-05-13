@@ -1,16 +1,17 @@
 'use strict'
 
 import Map from '@supercharge/map'
-import { Application } from './application'
-import { ArgvInput } from './input/argv-input'
+import Str from '@supercharge/strings'
+import { Application } from '../application'
+import { ArgvInput } from '../input/argv-input'
 import { tap, upon } from '@supercharge/goodies'
-import { InputOption } from './input/input-option'
-import { ConsoleOutput } from './io/console-output'
+import { InputOption } from '../input/input-option'
+import { ConsoleOutput } from '../io/console-output'
 import { CommandContract } from './command-contract'
-import { InputArgument } from './input/input-argument'
-import { InputDefinition } from './input/input-definition'
-import { InputOptionBuilder } from './input/input-option-builder'
-import { InputArgumentBuilder } from './input/input-argument-builder'
+import { InputArgument } from '../input/input-argument'
+import { InputDefinition } from '../input/input-definition'
+import { InputOptionBuilder } from '../input/input-option-builder'
+import { InputArgumentBuilder } from '../input/input-argument-builder'
 
 interface CommandMeta {
   name: string
@@ -77,6 +78,15 @@ export class Command implements CommandContract {
    */
   getDescription (): string {
     return this.meta.description ?? ''
+  }
+
+  /**
+   * Determine whether the command has a description.
+   *
+   * @returns {Boolean}
+   */
+  hasDescription (): boolean {
+    return Str(this.getDescription()).isNotEmpty()
   }
 
   /**
