@@ -64,14 +64,14 @@ export class ArgvInput extends Input {
         return this.arguments().set(arg?.name() as string, argument)
       }
 
-      // too many arguments provided
-      if (this.definition().arguments().size()) {
-        throw new Error(`Too many arguments in command ${this.constructor.name}: expected arguments "${
-          this.definition().argumentNames().join(', ')
-        }"`)
+      // no arguments expected
+      if (this.definition().arguments().isEmpty()) {
+        throw new Error('No arguments expected')
       }
 
-      throw new Error(`No arguments expected in command ${this.constructor.name}`)
+      throw new Error(`Too many arguments: expected arguments "${
+        this.definition().argumentNames().join(', ')
+      }"`)
     })
 
     return this
@@ -97,7 +97,7 @@ export class ArgvInput extends Input {
         return this.options().set(name, value)
       }
 
-      throw new Error(`Unexpected option "${name}" in command ${this.constructor.name}`)
+      throw new Error(`Unexpected option "${name}"`)
     })
 
     return this
