@@ -224,7 +224,9 @@ export class Application {
     try {
       await this.showHelpWhenNecessary(argv)
 
-      await this.get(argv.firstArgument()).handle(argv)
+      const command = this.get(argv.firstArgument()) ?? this.defaultCommand()
+      await command.handle(argv)
+
       await this.terminate()
     } catch (error) {
       await this.terminate(error)
@@ -239,7 +241,7 @@ export class Application {
    *
    * @returns {Command}
    */
-  get (name: string): Command {
+  get (name: string): Command | undefined {
     const command = this.commands().find(command => {
       return command.getName() === name
     })
@@ -251,8 +253,6 @@ export class Application {
     if (name) {
       throw new Error(`"${name}" command not registered`)
     }
-
-    return this.defaultCommand()
   }
 
   /**
@@ -269,9 +269,7 @@ export class Application {
     await new HelpCommand()
       .setApplication(this)
       .forCommand(
-        argv.firstArgument()
-          ? this.get(argv.firstArgument())
-          : undefined
+        this.get(argv.firstArgument())
       )
       .handle(argv)
 
