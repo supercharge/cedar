@@ -142,8 +142,21 @@ export abstract class Input {
     * Determine whether an option with the given `name` exists.
     *
     * @param {String} name
+    *
+    * @returns {Boolean}
     */
   hasOption (name: string): boolean {
     return this.options().has(name)
+  }
+
+  /**
+    * Determine whether an option with the given `name` is missing.
+    *
+    * @param {String} name
+    *
+    * @returns {Boolean}
+    */
+  isMissingOption (name: string): boolean {
+    return !this.hasOption(name)
   }
 }
