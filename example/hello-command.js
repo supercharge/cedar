@@ -9,7 +9,7 @@ class HelloCommand extends Command {
   configure () {
     this
       .name('hello')
-      .description('Say hello')
+      .description('Send a friendly hello to a given name :)')
 
       /**
        * either use an argument builder
