@@ -215,45 +215,66 @@ export class Application {
     try {
       argv = argv.bind(this.definition())
     } catch (error) {
-      // ignore error at this point. At this point, we want the command name
+      // Ignore validation error. At this point, we want the command name
     }
 
     if (argv.hasOption('version')) {
       return this.outputNameAndVersion()
     }
 
-    const commandName = argv.firstArgument()
-
-    const command = this.commands().find(command => {
-      return command.getName() === commandName
-    })
-
     try {
-      await this.showHelpWhenNecessaryFor(argv, command)
+      await this.showHelpWhenNecessary(argv)
 
-      if (command) {
-        await command.handle(argv)
-
-        return await this.terminate()
-      }
-
-      if (commandName) {
-        throw new Error(`"${commandName}" command not registered`)
-      }
-
-      await this.defaultCommand().handle(argv)
+      await this.get(argv.firstArgument()).handle(argv)
       await this.terminate()
     } catch (error) {
       await this.terminate(error)
     }
   }
 
-  async showHelpWhenNecessaryFor (argv: ArgvInput, command?: Command): Promise<void> {
-    if (argv.hasOption('help')) {
-      await new HelpCommand().setApplication(this).forCommand(command).handle(argv)
+  /**
+   * Returns the command for the given `name`. Throws an error if
+   * no command is registered for the given name.
+   *
+   * @param {String} name
+   *
+   * @returns {Command}
+   */
+  get (name: string): Command {
+    const command = this.commands().find(command => {
+      return command.getName() === name
+    })
 
-      return await this.terminate()
+    if (command) {
+      return command
     }
+
+    if (name) {
+      throw new Error(`"${name}" command not registered`)
+    }
+
+    return this.defaultCommand()
+  }
+
+  /**
+   * Print help output to the terminal. If available, print help for the specific `command`.
+   *
+   * @param argv
+   * @param command
+   */
+  async showHelpWhenNecessary (argv: ArgvInput): Promise<void> {
+    if (argv.isMissingOption('help')) {
+      return
+    }
+
+    await new HelpCommand()
+      .setApplication(this)
+      .forCommand(
+        this.get(argv.firstArgument())
+      )
+      .handle(argv)
+
+    await this.terminate()
   }
 
   /**
