@@ -46,6 +46,7 @@ class HelloCommand extends Command {
     this.io()
       .emptyLine()
       .success(' Hello ', message)
+      .emptyLine()
   }
 
   /**
