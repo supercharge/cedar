@@ -1,13 +1,12 @@
 'use strict'
 
 import kleur from 'kleur'
-import { Command } from './command'
+import { Command } from './command/command'
 import { tap } from '@supercharge/goodies'
 import { ArgvInput } from './input/argv-input'
 import { InputOption } from './input/input-option'
 import { ConsoleOutput } from './io/console-output'
 import { HelpCommand } from './command/help-command'
-import { ListCommands } from './command/list-command'
 import { InputArgument } from './input/input-argument'
 import { InputDefinition } from './input/input-definition'
 
@@ -60,7 +59,7 @@ export class Application {
       commands: [],
       output: new ConsoleOutput(),
       definition: this.defaultInputDefinition(),
-      defaultCommand: new ListCommands().setApplication(this)
+      defaultCommand: new HelpCommand().setApplication(this)
     }
   }
 
@@ -270,7 +269,9 @@ export class Application {
     await new HelpCommand()
       .setApplication(this)
       .forCommand(
-        this.get(argv.firstArgument())
+        argv.firstArgument()
+          ? this.get(argv.firstArgument())
+          : undefined
       )
       .handle(argv)
 
