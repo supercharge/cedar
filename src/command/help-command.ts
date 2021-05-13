@@ -16,8 +16,16 @@ export class HelpCommand extends Command {
     this
       .name('help')
       .description('Show help for the application or a given command.')
+      .ignoreValidationErrors()
   }
 
+  /**
+   * Assign the command for which to show the help output.
+   *
+   * @param command
+   *
+   * @returns {HelpCommand}
+   */
   forCommand (command?: Command): this {
     return tap(this, () => {
       this.command = command
