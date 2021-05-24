@@ -1,8 +1,7 @@
 'use strict'
 
-import kleur from 'kleur'
-import { Command } from './command/command'
 import { tap } from '@supercharge/goodies'
+import { Command } from './command/command'
 import { ArgvInput } from './input/argv-input'
 import { InputOption } from './input/input-option'
 import { HelpCommand } from './command/help-command'
@@ -290,15 +289,16 @@ export class Application {
    */
   outputNameAndVersion (): void {
     if (this.name() && this.version()) {
-      return console.log(`${this.name()} ${kleur.green(this.version())}`)
+      this.output().log(`${this.name()} ${this.output().colors().green(this.version())}`)
+      return
     }
 
     if (this.name()) {
-      console.log(this.name())
+      this.output().log(this.name())
     }
 
     if (this.version()) {
-      console.log(kleur.green(this.version()))
+      this.output().success(this.version())
     }
   }
 
