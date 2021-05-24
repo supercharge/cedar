@@ -5,9 +5,9 @@ import { Command } from './command/command'
 import { tap } from '@supercharge/goodies'
 import { ArgvInput } from './input/argv-input'
 import { InputOption } from './input/input-option'
-import { ConsoleOutput } from './io/console-output'
 import { HelpCommand } from './command/help-command'
 import { InputArgument } from './input/input-argument'
+import { ConsoleOutput } from '@supercharge/console-io'
 import { InputDefinition } from './input/input-definition'
 
 interface ApplicationMeta {
@@ -316,7 +316,7 @@ export class Application {
       return process.exit(exitCode)
     }
 
-    this.output().emptyLine().error(error)
+    this.output().blankLine().error(error)
 
     return process.exit(exitCode)
   }
