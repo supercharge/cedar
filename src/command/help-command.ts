@@ -67,7 +67,7 @@ export class HelpCommand extends Command {
           this.io().colors().bold().magenta('Description')
         )
         .log(`  ${this.command.getDescription()}`)
-        .emptyLine()
+        .blankLine()
     }
 
     return this
@@ -82,7 +82,7 @@ export class HelpCommand extends Command {
           this.wrapCommandArguments()
         )}`
       )
-      .emptyLine()
+      .blankLine()
 
     return this
   }
@@ -121,7 +121,7 @@ export class HelpCommand extends Command {
     })
 
     return tap(this, () => {
-      this.io().emptyLine()
+      this.io().blankLine()
     })
   }
 
@@ -151,7 +151,7 @@ export class HelpCommand extends Command {
     })
 
     return tap(this, () => {
-      this.io().emptyLine()
+      this.io().blankLine()
     })
   }
 
@@ -166,7 +166,7 @@ export class HelpCommand extends Command {
    */
   private outputAppVersion (): void {
     this.application().outputNameAndVersion()
-    this.io().emptyLine()
+    this.io().blankLine()
   }
 
   private outputCommandOverview (): void {

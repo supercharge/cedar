@@ -1,12 +1,12 @@
 'use strict'
 
+import { IO } from '../io/io'
 import Map from '@supercharge/map'
 import Str from '@supercharge/strings'
 import { Application } from '../application'
 import { ArgvInput } from '../input/argv-input'
 import { tap, upon } from '@supercharge/goodies'
 import { InputOption } from '../input/input-option'
-import { ConsoleOutput } from '../io/console-output'
 import { CommandContract } from './command-contract'
 import { InputArgument } from '../input/input-argument'
 import { InputDefinition } from '../input/input-definition'
@@ -22,7 +22,7 @@ interface CommandMeta {
   definition: InputDefinition
   input: ArgvInput
 
-  output: ConsoleOutput
+  io: IO
 }
 
 export class Command implements CommandContract {
@@ -45,7 +45,7 @@ export class Command implements CommandContract {
       definition: new InputDefinition(),
       input: new ArgvInput(),
 
-      output: new ConsoleOutput()
+      io: new IO()
     }
 
     this.configure()
@@ -324,12 +324,12 @@ export class Command implements CommandContract {
   }
 
   /**
-   * Returns the output interface.
+   * Returns the console input/output instance.
    *
-   * @returns {ConsoleOutput}
+   * @returns {IO}
    */
-  io (): ConsoleOutput {
-    return this.meta.output
+  io (): IO {
+    return this.meta.io
   }
 
   /**
