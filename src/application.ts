@@ -156,6 +156,23 @@ export class Application {
   }
 
   /**
+   * Assign the given `command` as the default command for this application.
+   *
+   * @param {Command} command
+   *
+   * @returns {Application}
+   */
+  useDefaultCommand (command: Command): Application {
+    if (!(command instanceof Command)) {
+      throw new Error('The default command must be a "Command" instance')
+    }
+
+    return tap(this, () => {
+      this.meta.defaultCommand = command
+    })
+  }
+
+  /**
    * Register a new command for the given `name`.
    *
    * @param {String} name
@@ -233,6 +250,27 @@ export class Application {
   }
 
   /**
+   * Print help output to the terminal. If available, print help for the specific `command`.
+   *
+   * @param argv
+   * @param command
+   */
+  async showHelpWhenNecessary (argv: ArgvInput): Promise<void> {
+    if (argv.isMissingOption('help')) {
+      return
+    }
+
+    await new HelpCommand()
+      .setApplication(this)
+      .forCommand(
+        this.get(argv.firstArgument())
+      )
+      .handle(argv)
+
+    await this.terminate()
+  }
+
+  /**
    * Returns the command for the given `name`. Throws an error if
    * no command is registered for the given name.
    *
@@ -255,33 +293,29 @@ export class Application {
   }
 
   /**
-   * Print help output to the terminal. If available, print help for the specific `command`.
+   * Determine whether the application has a command for the given `name`.
    *
-   * @param argv
-   * @param command
+   * @param {String} name
+   *
+   * @returns {Boolean}
    */
-  async showHelpWhenNecessary (argv: ArgvInput): Promise<void> {
-    if (argv.isMissingOption('help')) {
-      return
+  has (name: string): boolean {
+    try {
+      return !!this.get(name)
+    } catch (error) {
+      return false
     }
-
-    await new HelpCommand()
-      .setApplication(this)
-      .forCommand(
-        this.get(argv.firstArgument())
-      )
-      .handle(argv)
-
-    await this.terminate()
   }
 
   /**
-   * Returns the list of default aliases, like `help: 'h'` and `version: 'v'`.
+   * Determine whether the application is missing a command for the given `name`.
    *
-   * @returns {Object}
+   * @param {String} name
+   *
+   * @returns {Boolean}
    */
-  defaultAliases (): { [key: string]: string|string[] } {
-    return { help: 'h', version: 'v' }
+  isMissing (name: string): boolean {
+    return !this.has(name)
   }
 
   /**
@@ -309,7 +343,7 @@ export class Application {
    *
    * @param {Error} error
    */
-  private async terminate (error?: Error): Promise<void> {
+  async terminate (error?: Error): Promise<void> {
     const exitCode = error ? 1 : 0
 
     if (!error) {
@@ -317,7 +351,6 @@ export class Application {
     }
 
     this.output().blankLine().error(error)
-
-    return process.exit(exitCode)
+    process.exit(exitCode)
   }
 }
