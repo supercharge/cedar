@@ -6,13 +6,11 @@ import { InputDefinition } from './input-definition'
 
 export abstract class Input {
   /**
-   * The parsed input tokens.
+   * Stores the input meta data. The bound definition and parsed arguments and options.
    */
   private readonly meta: {
     definition: InputDefinition
-
     options: Map<string, unknown>
-
     arguments: Map<string, unknown>
   }
 
@@ -61,7 +59,7 @@ export abstract class Input {
    *
    * @returns {ThisType}
    */
-  public bind (definition: InputDefinition): this {
+  bind (definition: InputDefinition): this {
     return this.withDefinition(definition).parse().validate()
   }
 
