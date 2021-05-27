@@ -2,7 +2,7 @@
 
 import { Input } from './input'
 import { tap } from '@supercharge/goodies'
-import minimist, { ParsedArgs, Opts as ParseOptions } from 'minimist'
+import minimist, { ParsedArgs } from 'minimist'
 
 export class ArgvInput extends Input {
   /**
@@ -23,16 +23,16 @@ export class ArgvInput extends Input {
   constructor (args?: string[]) {
     super()
 
-    this.args = args ?? process.argv.slice(2)
     this.parsed = { _: [] }
+    this.args = args ?? process.argv.slice(2)
   }
 
   /**
    * Parse the command line input (arguments and options).
    */
-  parse (options?: ParseOptions): this {
+  parse (): this {
     return tap(this, () => {
-      this.parsed = minimist(this.args, options ?? {})
+      this.parsed = minimist(this.args)
       this.assignParsedInput()
     })
   }
@@ -61,7 +61,7 @@ export class ArgvInput extends Input {
       if (this.definition().hasArgument(index)) {
         const arg = this.definition().argument(index)
 
-        return this.arguments().set(arg?.name() as string, argument)
+        return this.arguments().set(arg?.name(), argument)
       }
 
       // no arguments expected
@@ -89,8 +89,7 @@ export class ArgvInput extends Input {
       if (this.definition().hasOptionShortcut(name)) {
         const option = this.definition().optionByShortcut(name)
 
-        return this.options().set(option?.name() as string, value
-        )
+        return this.setOption(option?.name(), value)
       }
 
       if (this.definition().hasOption(name)) {
