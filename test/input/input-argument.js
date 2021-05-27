@@ -1,7 +1,7 @@
 'use strict'
 
 const { test } = require('tap')
-const { InputArgument } = require('../dist')
+const { InputArgument } = require('../../dist')
 
 test('Input Argument', async () => {
   test('name', async t => {

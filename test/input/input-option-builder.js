@@ -1,7 +1,7 @@
 'use strict'
 
 const { test } = require('tap')
-const { InputOptionBuilder, InputOption } = require('../dist')
+const { InputOptionBuilder, InputOption } = require('../../dist')
 
 test('Input Option Builder', async () => {
   test('description', async t => {
