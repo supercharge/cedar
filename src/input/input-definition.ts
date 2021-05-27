@@ -181,9 +181,22 @@ export class InputDefinition {
       throw new Error(`Argument "${argument.name()}" is already registered.`)
     }
 
+    if (argument.isRequired() && this.lastArgumentIsOptional()) {
+      throw new Error(`Cannot add required argument "${argument.name()}" after optional argument "${String(this.arguments().at(-1)?.name())}".`)
+    }
+
     return tap(this, () => {
       this.arguments().add(argument)
     })
+  }
+
+  /**
+   * Determine whether the last argument added to this definition is optional.
+   *
+   * @returns {Boolean}
+   */
+  private lastArgumentIsOptional (): boolean {
+    return this.arguments().isNotEmpty() && this.arguments().at(-1)?.isOptional() as boolean
   }
 
   /**
