@@ -67,8 +67,8 @@ export class InputDefinition {
   }
 
   /**
-   * Creates a new argument for the given `name` for this command. Returns a
-   * builder instance to configure the added argument with fluent methods.
+   * Adds a new input option in this input definition. Throws an error if an
+   * option with the name or shortcut already exsits in this definition.
    *
    * @param {String} name
    *
@@ -142,7 +142,7 @@ export class InputDefinition {
   /**
    * Returns the defined input arguments.
    *
-   * @returns {Map}
+   * @returns {Set<InputArgument>}
    */
   arguments (): Set<InputArgument> {
     return this.meta.arguments
@@ -167,10 +167,10 @@ export class InputDefinition {
   }
 
   /**
-   * Creates a new argument for the given `name` for this command. Returns a
-   * builder instance to configure the added argument with fluent methods.
+   * Adds the given `argument` to this input definition. Throws
+   * an error if an argument with the same name already exists.
    *
-   * @param {String} name
+   * @param {InputArgument} argument
    *
    * @returns {InputDefinition}
    *
