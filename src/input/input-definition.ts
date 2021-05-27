@@ -58,12 +58,22 @@ export class InputDefinition {
    * Returns the input option instance for the given `name`. Returns
    * `undefined` if no input option is defined for the name.
    *
+   * @param {String} name
+   *
    * @returns {InputOption}
+   *
+   * @throws
    */
-  option (name: string): InputOption | undefined {
-    return this.options().find(option => {
+  option (name: string): InputOption {
+    const option = this.options().find(option => {
       return option.name() === name
     })
+
+    if (option) {
+      return option
+    }
+
+    throw new Error(`The option "${name}" is not registered.`)
   }
 
   /**
@@ -102,7 +112,11 @@ export class InputDefinition {
    * @returns {Boolean}
    */
   hasOption (name: string): boolean {
-    return !!this.option(name)
+    try {
+      return !!this.option(name)
+    } catch (error) {
+      return false
+    }
   }
 
   /**
@@ -121,11 +135,19 @@ export class InputDefinition {
    * `undefined` if no input option is defined for the name.
    *
    * @returns {InputOption}
+   *
+   * @throws
    */
-  optionByShortcut (name: string): InputOption | undefined {
-    return this.options().find(option => {
+  optionByShortcut (name: string): InputOption {
+    const option = this.options().find(option => {
       return option.shortcuts().includes(name)
     })
+
+    if (option) {
+      return option
+    }
+
+    throw new Error(`The option with shortcut "${name}" is not registered.`)
   }
 
   /**
@@ -136,7 +158,11 @@ export class InputDefinition {
    * @returns {Boolean}
    */
   hasOptionShortcut (name: string): boolean {
-    return !!this.optionByShortcut(name)
+    try {
+      return !!this.optionByShortcut(name)
+    } catch (error) {
+      return false
+    }
   }
 
   /**
@@ -155,15 +181,19 @@ export class InputDefinition {
    * @param {String|Number} name
    *
    * @returns {InputArgument|undefined}
+   *
+   * @throws
    */
-  argument (name: string | number): InputArgument | undefined {
-    if (Number.isInteger(name)) {
-      return this.arguments().at(name as number)
+  argument (name: string | number): InputArgument {
+    const argument = Number.isInteger(name)
+      ? this.arguments().at(name as number)
+      : this.arguments().find(argument => argument.name() === name)
+
+    if (argument) {
+      return argument
     }
 
-    return this.arguments().find(argument => {
-      return argument.name() === name
-    })
+    throw new Error(`The argument "${name}" is not registered.`)
   }
 
   /**
@@ -209,7 +239,11 @@ export class InputDefinition {
    * @returns {Boolean}
    */
   hasArgument (name: string | number): boolean {
-    return !!this.argument(name)
+    try {
+      return !!this.argument(name)
+    } catch (error) {
+      return false
+    }
   }
 
   /**
