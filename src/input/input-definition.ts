@@ -19,9 +19,9 @@ export class InputDefinition {
   }
 
   /**
-   * Create a new option instance for the given `name`.
+   * Create a new instance for the given `definition` (a list of input arguments and options).
    *
-   * @param {String} name
+   * @param {Array<InputArgument | InputOption>} definition
    */
   constructor (definition?: Array<InputArgument | InputOption>) {
     this.meta = {
