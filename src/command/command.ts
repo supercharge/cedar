@@ -3,9 +3,9 @@
 import { IO } from '../io/io'
 import Map from '@supercharge/map'
 import Str from '@supercharge/strings'
+import { tap } from '@supercharge/goodies'
 import { Application } from '../application'
 import { ArgvInput } from '../input/argv-input'
-import { tap, upon } from '@supercharge/goodies'
 import { InputOption } from '../input/input-option'
 import { CommandContract } from './command-contract'
 import { InputArgument } from '../input/input-argument'
@@ -220,6 +220,11 @@ export class Command implements CommandContract {
     return builder
   }
 
+  /**
+   * Returns the argv input coming from the terminal.
+   *
+   * @returns {ArgvInput}
+   */
   private input (): ArgvInput {
     if (!this.meta.input) {
       throw new Error('Missing input')
@@ -311,16 +316,24 @@ export class Command implements CommandContract {
    *
    * @throws
    */
-  addOption (name: string): InputOptionBuilder {
+  addOption (name: string): InputOptionBuilder
+  addOption (name: string, callback: (builder: InputOptionBuilder) => void): Command
+  addOption (name: string, callback?: any): any {
     if (!name) {
-      throw new Error(`Missing option name in command ${this.constructor.name}`)
+      throw new Error(`Missing option name in command "${this.constructor.name}"`)
     }
 
-    return upon(new InputOption(name), option => {
-      this.definition().addOption(option)
+    const option = new InputOption(name)
+    this.definition().addOption(option)
 
-      return new InputOptionBuilder(option)
-    })
+    const builder = new InputOptionBuilder(option)
+
+    if (typeof callback === 'function') {
+      callback(builder)
+      return this
+    }
+
+    return builder
   }
 
   /**
