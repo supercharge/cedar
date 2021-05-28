@@ -208,6 +208,10 @@ export class Application {
    * @returns {Application}
    */
   add (command: Command): this {
+    if (!command.getName()) {
+      throw new Error(`Command "${command.constructor.name}" is missing a command name.`)
+    }
+
     if (command.isEnabled()) {
       command.setApplication(this)
       this.commands().push(command)
