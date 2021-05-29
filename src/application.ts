@@ -355,7 +355,7 @@ export class Application {
       return process.exit(exitCode)
     }
 
-    this.output().blankLine().error(error)
+    this.output().blankLine().error(error).blankLine()
     process.exit(exitCode)
   }
 }

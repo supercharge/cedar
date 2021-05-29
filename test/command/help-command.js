@@ -106,9 +106,6 @@ test('Command', async () => {
 
     t.equal(commandIoStub.called, true)
 
-    console.log(logger.logs())
-    console.log('----------------------------------------------------------------------')
-
     t.ok(logger.logs().find(log => {
       return log.message.includes('this is the test command description')
     }))

@@ -205,7 +205,7 @@ test('Console Application', async () => {
 
     const output = {
       blankLine () { return this },
-      error () {}
+      error () { return this }
     }
 
     const outputStub = Sinon.stub(app, 'output').returns(output)
@@ -213,7 +213,7 @@ test('Console Application', async () => {
 
     await app.run()
 
-    t.ok(outputStub.calledOnce)
+    t.ok(outputStub.called)
     t.ok(processExitStub.calledOnce)
     t.ok(processExitStub.calledWith(1))
 
@@ -229,14 +229,16 @@ test('Console Application', async () => {
       blankLine () { return this },
       error (err) {
         error = err
+        return this
       }
     }
+
     const outputStub = Sinon.stub(app, 'output').returns(output)
     const processExitStub = Sinon.stub(process, 'exit').returns()
 
     await app.run(['missing:command'])
 
-    t.ok(outputStub.calledOnce)
+    t.ok(outputStub.called)
     t.ok(processExitStub.calledOnce)
     t.ok(processExitStub.calledWith(1))
     t.ok(String(error.message).includes('command not registered'))
