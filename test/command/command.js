@@ -2,7 +2,7 @@
 
 const Sinon = require('sinon')
 const { test } = require('tap')
-const { Application, Command, InputArgumentBuilder, InputOptionBuilder } = require('../../dist')
+const { Application, Command, InputArgumentBuilder, InputOptionBuilder, ArgvInput } = require('../../dist')
 
 test('Command', async () => {
   test('constructor', async t => {
@@ -69,6 +69,22 @@ test('Command', async () => {
     t.equal(command.argument('name'), 'Supercharge')
   })
 
+  test('argument', async t => {
+    class TestCommand extends Command {
+      configure () {
+        this
+          .name('test:command')
+          .addArgument('name', builder => builder.defaultValue('Supercharge'))
+      }
+
+      run () { }
+    }
+
+    const command = new TestCommand()
+    await command.handle(new ArgvInput(['test:command', 'Marcus']))
+    t.equal(command.argument('name'), 'Marcus')
+  })
+
   test('throws when accessing an undefined argument', async t => {
     const command = new Command()
     t.throws(() => command.argument('name'), 'The argument "name" does not exist in command "Command"')
@@ -99,6 +115,22 @@ test('Command', async () => {
     const command = new Command('')
     command.addOption('dry-run').defaultValue('whynot')
     t.equal(command.option('dry-run'), 'whynot')
+  })
+
+  test('option', async t => {
+    class TestCommand extends Command {
+      configure () {
+        this
+          .name('test:command')
+          .addOption('dry-run', builder => builder.defaultValue('whynot'))
+      }
+
+      run () { }
+    }
+
+    const command = new TestCommand()
+    await command.handle(new ArgvInput(['test:command', '--dry-run=abc']))
+    t.equal(command.option('dry-run'), 'abc')
   })
 
   test('throws when accessing an undefined argument', async t => {
@@ -138,30 +170,62 @@ test('Command', async () => {
     processExitStub.restore()
   })
 
-  // test('throws when the command does not define the given argument', async t => {
-  //   const processExitStub = Sinon.stub(process, 'exit').returns()
+  test('throws when the command does not define the given argument', async t => {
+    const processExitStub = Sinon.stub(process, 'exit')
+    let ran = false
 
-  //   let ran = false
+    class TestCommand extends Command {
+      configure () {
+        this.name('test:command')
+      }
 
-  //   class TestCommand extends Command {
-  //     configure () {
-  //       this.name('test:command')
-  //     }
+      run () { ran = true }
+    }
 
-  //     run () { ran = true }
-  //   }
+    await new Application()
+      .add(new TestCommand())
+      .run(['test:command', 'argument1'])
 
-  //   await t.rejects(() => {
-  //     return new Application().add(
-  //       new TestCommand()
-  //     ).run(['test:command', 'argument1'])
-  //   })
+    t.equal(ran, false)
+    t.equal(processExitStub.calledOnce, true)
+    t.equal(processExitStub.calledWith(1), true)
 
-  //   t.equal(ran, false)
-  //   t.equal(processExitStub.calledWith(1), true)
+    processExitStub.restore()
+  })
 
-  //   processExitStub.restore()
-  // })
+  test('ignores validation errors', async t => {
+    const processExitStub = Sinon.stub(process, 'exit')
+
+    let ran = false
+
+    class TestCommand extends Command {
+      configure () {
+        this
+          .name('test:command')
+          .ignoreValidationErrors()
+      }
+
+      run () { ran = true }
+    }
+
+    await new Application()
+      .add(new TestCommand())
+      .run(['test:command', 'argument1'])
+
+    t.equal(ran, true)
+    t.equal(processExitStub.calledOnce, true)
+    t.equal(processExitStub.calledWith(0), true)
+
+    processExitStub.restore()
+  })
+
+  test('throws when missing input', async t => {
+    const command = new Command()
+    t.throws(() => {
+      command.meta.input = null
+      command.input()
+    })
+  })
 })
 
 class HiddenCommand extends Command {
