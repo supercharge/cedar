@@ -1,5 +1,6 @@
 'use strict'
 
+import Set from '@supercharge/set'
 import { tap } from '@supercharge/goodies'
 import { Command } from './command/command'
 import { ArgvInput } from './input/argv-input'
@@ -23,7 +24,7 @@ interface ApplicationMeta {
   /**
    * The command list.
    */
-  commands: Command[]
+  commands: Set<Command>
 
   /**
    * The default command to run on empty input.
@@ -55,7 +56,7 @@ export class Application {
   constructor (name: string = '') {
     this.meta = {
       name,
-      commands: [],
+      commands: new Set(),
       output: new ConsoleOutput(),
       definition: this.defaultInputDefinition(),
       defaultCommand: new HelpCommand().setApplication(this)
@@ -131,9 +132,9 @@ export class Application {
   /**
    * Returns the registered commands.
    *
-   * @returns {Command[]}
+   * @returns {Set<Command>}
    */
-  commands (): Command[] {
+  commands (): Set<Command> {
     return this.meta.commands
   }
 
@@ -214,7 +215,7 @@ export class Application {
 
     if (command.isEnabled()) {
       command.setApplication(this)
-      this.commands().push(command)
+      this.commands().add(command)
     }
 
     return this
