@@ -137,7 +137,7 @@ test('Console Application', async () => {
 
     app.add(new TestCommand())
 
-    t.equal(app.commands().length, 1)
+    t.equal(app.commands().size(), 1)
   })
 
   test('with default command', async t => {
