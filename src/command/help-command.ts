@@ -117,7 +117,7 @@ export class HelpCommand extends Command {
     this.command?.definition().arguments().forEach(argument => {
       const whiteSpace = ''.padEnd(maxWidth - argument.name().length)
 
-      console.log(`  ${this.io().colors().yellow(argument.name())} ${whiteSpace} ${this.io().colors().white().dim(argument.description())}`)
+      this.io().log(`  ${this.io().colors().yellow(argument.name())} ${whiteSpace} ${this.io().colors().white().dim(argument.description())}`)
     })
 
     return tap(this, () => {
@@ -147,7 +147,7 @@ export class HelpCommand extends Command {
     this.command?.definition().options().forEach(option => {
       const whiteSpace = ''.padEnd(maxWidth - option.name().length)
 
-      console.log(`  ${this.io().colors().yellow(option.name())} ${whiteSpace} ${this.io().colors().white().dim(option.description())}`)
+      this.io().log(`  ${this.io().colors().yellow(option.name())} ${whiteSpace} ${this.io().colors().white().dim(option.description())}`)
     })
 
     return tap(this, () => {
@@ -170,6 +170,14 @@ export class HelpCommand extends Command {
   }
 
   private outputCommandOverview (): void {
+    if (this.application().commands().isEmpty()) {
+      this.io().log(
+        this.io().colors().bold().magenta('No commands available.')
+      )
+
+      return
+    }
+
     const commandWithLongestName = [...this.application().commands()].sort((a, b) => {
       return b.getName().length - a.getName().length
     }).shift()
@@ -180,16 +188,16 @@ export class HelpCommand extends Command {
 
     this.groupAndSortCommands().forEach(group => {
       this.isRoot(group)
-        ? console.log(this.io().colors().bold().magenta('Available commands:'))
-        : console.log(this.io().colors().bold().magenta(` ${group.name}`))
+        ? this.io().log(this.io().colors().bold().magenta('Available commands:'))
+        : this.io().log(this.io().colors().bold().magenta(` ${group.name}`))
 
       group.commands.forEach(command => {
         const whiteSpace = ''.padEnd(maxWidth - command.getName().length)
 
-        console.log(`  ${this.io().colors().yellow(command.getName())} ${whiteSpace} ${this.io().colors().white().dim(command.getDescription())}`)
+        this.io().log(`  ${this.io().colors().yellow(command.getName())} ${whiteSpace} ${this.io().colors().white().dim(command.getDescription())}`)
       })
 
-      console.log()
+      this.io().blankLine()
     })
   }
 
