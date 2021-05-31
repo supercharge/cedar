@@ -140,6 +140,19 @@ test('Console Application', async () => {
     t.equal(app.commands().size(), 1)
   })
 
+  test('namespaces', async t => {
+    const app = new Application()
+
+    app
+      .register('test')
+      .register('make:test')
+      .register('make:migration')
+      .register('db:seed')
+      .register('db:test')
+
+    t.same(app.namspaces(), ['make', 'db'])
+  })
+
   test('with default command', async t => {
     let called = false
 

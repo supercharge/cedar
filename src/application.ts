@@ -324,6 +324,26 @@ export class Application {
   }
 
   /**
+   * Returns the list of unique command namespaces. It does
+   * not return the root namespace which always exists.
+   *
+   * @returns {String[]}
+   */
+  namspaces (): string[] {
+    return this.commands()
+      .filter(command => {
+        return command.isEnabled()
+      })
+      .filter(command => {
+        return command.getName().split(':').length > 1
+      })
+      .map(command => {
+        return command.getName().split(':')[0]
+      })
+      .toArray()
+  }
+
+  /**
    * Print the application name and version to the console.
    */
   outputNameAndVersion (): void {
