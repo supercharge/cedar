@@ -156,6 +156,38 @@ test('Command', async () => {
 
     commandIoStub.restore()
   })
+
+  test('sorts commands by name (and namespace)', async t => {
+    const logger = new MemoryLogger()
+    const io = new IO().withLogger(logger)
+
+    const app = new Application()
+      .register('db:seed')
+      .register('db')
+      .register('mm:mm')
+      .register('aa:aa')
+      .register('aa:dd')
+      .register('aa:bb')
+      .register('mm:aa')
+      .register('migrations:run')
+      .register('migrations:status')
+      .register('migrations:rollback')
+      .register('migrations:latest')
+      .register('test')
+      .register('migrations:migrate')
+      .register('db:fake')
+      .register('list')
+
+    const command = new HelpCommand().setApplication(app)
+
+    const commandIoStub = Sinon.stub(command, 'io').returns(io)
+    await command.handle()
+
+    t.pass('TODO')
+    // TODO asset correct command order
+
+    commandIoStub.restore()
+  })
 })
 
 class TestCommand extends Command {
