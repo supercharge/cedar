@@ -141,9 +141,14 @@ test('Console Application', async () => {
   })
 
   test('namespaces', async t => {
-    const app = new Application()
+    const appWithoutNamespaces = new Application()
+      .register('make')
+      .register('list')
+      .register('supercharge')
 
-    app
+    t.same(appWithoutNamespaces.namspaces(), [])
+
+    const app = new Application()
       .register('test')
       .register('make:test')
       .register('make:migration')
