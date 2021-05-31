@@ -52,6 +52,9 @@ export class HelpCommand extends Command {
       : this.showHelpForApplication()
   }
 
+  /**
+   * Show help output (description, usage, arguments, and options) for the given command.
+   */
   private showHelpForCommand (): void {
     this
       .outputCommandDescription()
@@ -60,6 +63,11 @@ export class HelpCommand extends Command {
       .outputCommandOptions()
   }
 
+  /**
+   * Print the command description to the terminal.
+   *
+   * @returns {HelpCommand}
+   */
   private outputCommandDescription (): HelpCommand {
     if (this.command?.hasDescription()) {
       this.io()
@@ -73,6 +81,11 @@ export class HelpCommand extends Command {
     return this
   }
 
+  /**
+   * Print the command usage to the terminal.
+   *
+   * @returns {HelpCommand}
+   */
   private outputCommandUsage (): HelpCommand {
     this.io()
       .log(
@@ -87,6 +100,11 @@ export class HelpCommand extends Command {
     return this
   }
 
+  /**
+   * Create a string from required and optional arguments.
+   *
+   * @returns {HelpCommand}
+   */
   private wrapCommandArguments (): string {
     return this.command?.definition().arguments().join(argument => {
       return argument.isRequired()
@@ -95,6 +113,11 @@ export class HelpCommand extends Command {
     }).trimEnd() as string
   }
 
+  /**
+   * Print command arguments to the terminal.
+   *
+   * @returns {HelpCommand}
+   */
   private outputCommandArguments (): HelpCommand {
     const args = this.command?.definition().arguments()
 
@@ -125,6 +148,11 @@ export class HelpCommand extends Command {
     })
   }
 
+  /**
+   * Print command options to the terminal.
+   *
+   * @returns {HelpCommand}
+   */
   private outputCommandOptions (): HelpCommand {
     const options = this.command?.definition().options()
 
@@ -155,6 +183,10 @@ export class HelpCommand extends Command {
     })
   }
 
+  /**
+   * Print the application help to the terminal. Contains the application
+   * version, command overview and a list of globally available flags.
+   */
   private showHelpForApplication (): void {
     this.outputAppVersion()
     this.outputCommandOverview()
@@ -169,6 +201,11 @@ export class HelpCommand extends Command {
     this.io().blankLine()
   }
 
+  /**
+   * Print the command overview to the terminal.
+   *
+   * @returns {HelpCommand}
+   */
   private outputCommandOverview (): void {
     if (this.application().commands().isEmpty()) {
       this.io().log(
@@ -201,16 +238,33 @@ export class HelpCommand extends Command {
     })
   }
 
+  /**
+   * Determine whether the given `group` is the root group.
+   *
+   * @param {CommandGroup} group
+   *
+   * @returns {Boolean}
+   */
   private isRoot (group: CommandGroup): boolean {
     return group.name === 'root'
   }
 
+  /**
+   * Returns an array of sorted commands grouped by their namespace.
+   *
+   * @returns {CommandGroup[]}
+   */
   private groupAndSortCommands (): CommandGroup[] {
     return this.sortCommands(
       this.groupCommands()
     )
   }
 
+  /**
+   * Returns key-value pairs of namespaces with all their commands.
+   *
+   * @returns {}
+   */
   private groupCommands (): { [key: string]: Command[] } {
     return this.application()
       .commands()
@@ -227,6 +281,12 @@ export class HelpCommand extends Command {
     }, {})
   }
 
+  /**
+   * Sort all commands in the given `groups` by their name.
+   *
+   * @param groups
+   * @returns {CommandGroup[]}
+   */
   private sortCommands (groups: { [key: string]: Command[] }): CommandGroup[] {
     return Object.keys(groups).sort((curr, prev) => {
       if (curr === 'root') return -1
@@ -234,6 +294,7 @@ export class HelpCommand extends Command {
 
       if (curr < prev) return 1
       if (curr > prev) return -1
+
       return 0
     }).map(name => {
       return {
@@ -247,6 +308,10 @@ export class HelpCommand extends Command {
     })
   }
 
+  /**
+   * Print the globally available application flags to the terminal.
+   */
   private outputFlagOverview (): void {
+    //
   }
 }
