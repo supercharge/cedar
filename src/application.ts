@@ -265,14 +265,22 @@ export class Application {
       return
     }
 
+    await this.runHelpCommand(argv)
+    await this.terminate()
+  }
+
+  /**
+   * Runs the application’s help command.
+   *
+   * @param {ArgvInput} argv
+   */
+  async runHelpCommand (argv: ArgvInput): Promise<void> {
     await new HelpCommand()
       .setApplication(this)
       .forCommand(
         this.get(argv.firstArgument())
       )
       .handle(argv)
-
-    await this.terminate()
   }
 
   /**
