@@ -73,13 +73,19 @@ test('Console Application', async () => {
   })
 
   test('help', async t => {
-    const app = new Application()
+    const app = new Application().useDefaultCommand(
+      new NoopCommand()
+    )
+
     const terminateStub = Sinon.stub(app, 'terminate').resolves()
+    const runHelpCommandStub = Sinon.stub(app, 'runHelpCommand').resolves()
 
     await app.run(['-h'])
 
-    t.ok(terminateStub.called)
+    t.ok(runHelpCommandStub.calledOnce)
+    t.ok(terminateStub.calledTwice)
 
+    runHelpCommandStub.restore()
     terminateStub.restore()
   })
 
@@ -111,7 +117,7 @@ test('Console Application', async () => {
 
   test('add command', async t => {
     const app = new Application()
-    app.add(new TestCommand())
+    app.add(new NoopCommand())
 
     t.ok(app.has('test'))
     t.ok(app.isMissing('foo'))
@@ -122,7 +128,7 @@ test('Console Application', async () => {
 
     app.addCommands([
       new AppCommand(),
-      new TestCommand(),
+      new NoopCommand(),
       new NotEnabledCommand()
     ])
 
@@ -135,7 +141,7 @@ test('Console Application', async () => {
     const app = new Application()
     t.same(app.commands(), [])
 
-    app.add(new TestCommand())
+    app.add(new NoopCommand())
 
     t.equal(app.commands().size(), 1)
   })
@@ -266,7 +272,7 @@ test('Console Application', async () => {
   })
 })
 
-class TestCommand extends Command {
+class NoopCommand extends Command {
   configure () {
     this.name('test')
   }
