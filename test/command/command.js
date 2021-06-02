@@ -52,7 +52,7 @@ test('Command', async () => {
 
   test('addArgument returns command when using the argument builder', async t => {
     const command = new Command('')
-    const result = command.addArgument('name', builder => { })
+    const result = command.addArgument('name', () => { })
 
     t.equal(result instanceof Command, true)
     t.equal(command.definition().hasArgument('name'), true)
