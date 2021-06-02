@@ -265,7 +265,7 @@ export class HelpCommand extends Command {
    *
    * @returns {}
    */
-  private groupCommands (): { [key: string]: Command[] } {
+  groupCommands (): { [key: string]: Command[] } {
     return this.application()
       .commands()
       .reduce<{ [key: string]: Command[] }>((groups, command: Command) => {
@@ -287,24 +287,34 @@ export class HelpCommand extends Command {
    * @param groups
    * @returns {CommandGroup[]}
    */
-  private sortCommands (groups: { [key: string]: Command[] }): CommandGroup[] {
-    return Object.keys(groups).sort((curr, prev) => {
-      if (curr === 'root') return -1
-      if (prev === 'root') return -1
-
-      if (curr < prev) return 1
-      if (curr > prev) return -1
-
-      return 0
-    }).map(name => {
+  sortCommands (groups: { [key: string]: Command[] }): CommandGroup[] {
+    return this.sortGroups(
+      Object.keys(groups)
+    ).map(name => {
       return {
         name,
         commands: groups[name].sort((a, b) => {
-          if (a.getName() < b.getName()) return 1
-          if (a.getName() > b.getName()) return -1
-          return 0
+          return a.getName() < b.getName()
+            ? -1
+            : 1
         })
       }
+    })
+  }
+
+  /**
+   * Sort the given `groupNames` alphabetically, except the "root" group comes always first.
+   *
+   * @param {String[]} groupNames
+   *
+   * @returns {String[]}
+   */
+  sortGroups (groupNames: string[]): string[] {
+    return [...groupNames].sort((a, b) => {
+      if (a === 'root') return -1
+      if (b === 'root') return 1
+      if (b < a) return 1
+      return -1
     })
   }
 

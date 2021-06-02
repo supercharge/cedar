@@ -157,18 +157,45 @@ test('Command', async () => {
     commandIoStub.restore()
   })
 
-  test('sorts commands by name (and namespace)', async t => {
+  test('groupCommands', async t => {
+    const app = new Application()
+      .register('db:seed')
+      .register('migrations:run')
+      .register('test')
+
+    const groupedCommands = new HelpCommand()
+      .setApplication(app)
+      .groupCommands()
+
+    t.same(Object.keys(groupedCommands), ['db', 'migrations', 'root'])
+  })
+
+  test('sortGroups', async t => {
+    const app = new Application()
+      .register('list')
+      .register('db:seed')
+      .register('test:double')
+      .register('migrations:status')
+      .register('migrations:run')
+      .register('migrations:migrate')
+      .register('db:fake')
+
+    const command = new HelpCommand().setApplication(app)
+
+    const sortedGroupNames = command.sortGroups(
+      Object.keys(command.groupCommands())
+    )
+
+    t.same(sortedGroupNames, ['root', 'db', 'migrations', 'test'])
+  })
+
+  test('sortCommands (first by namespace, then by command name)', async t => {
     const logger = new MemoryLogger()
     const io = new IO().withLogger(logger)
 
     const app = new Application()
       .register('db:seed')
       .register('db')
-      .register('mm:mm')
-      .register('aa:aa')
-      .register('aa:dd')
-      .register('aa:bb')
-      .register('mm:aa')
       .register('migrations:run')
       .register('migrations:status')
       .register('migrations:rollback')
@@ -181,10 +208,27 @@ test('Command', async () => {
     const command = new HelpCommand().setApplication(app)
 
     const commandIoStub = Sinon.stub(command, 'io').returns(io)
-    await command.handle()
+    const groups = command.sortCommands(
+      command.groupCommands()
+    )
 
-    t.pass('TODO')
-    // TODO asset correct command order
+    t.equal(groups.length, 3)
+    t.equal(groups[0].name, 'root')
+    t.equal(groups[1].name, 'db')
+    t.equal(groups[2].name, 'migrations')
+
+    t.same(
+      groups[0].commands.map(command => command.getName()),
+      ['db', 'list', 'test']
+    )
+    t.same(
+      groups[1].commands.map(command => command.getName()),
+      ['db:fake', 'db:seed']
+    )
+    t.same(
+      groups[2].commands.map(command => command.getName()),
+      ['migrations:latest', 'migrations:migrate', 'migrations:rollback', 'migrations:run', 'migrations:status']
+    )
 
     commandIoStub.restore()
   })
