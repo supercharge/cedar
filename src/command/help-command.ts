@@ -95,7 +95,6 @@ export class HelpCommand extends Command {
           this.wrapCommandArguments()
         )}`
       )
-      .blankLine()
 
     return this
   }
@@ -125,9 +124,11 @@ export class HelpCommand extends Command {
       return this
     }
 
-    this.io().log(
-      this.io().colors().bold().magenta('Arguments')
-    )
+    this.io()
+      .blankLine()
+      .log(
+        this.io().colors().bold().magenta('Arguments')
+      )
 
     const argumentWithLongestName = this.command?.definition().arguments().toArray().sort((a, b) => {
       return b.name().length - a.name().length
@@ -143,9 +144,7 @@ export class HelpCommand extends Command {
       this.io().log(`  ${this.io().colors().yellow(argument.name())} ${whiteSpace} ${this.io().colors().white().dim(argument.description())}`)
     })
 
-    return tap(this, () => {
-      this.io().blankLine()
-    })
+    return this
   }
 
   /**
@@ -160,9 +159,11 @@ export class HelpCommand extends Command {
       return this
     }
 
-    this.io().log(
-      this.io().colors().bold().magenta('Options/Flags')
-    )
+    this.io()
+      .blankLine()
+      .log(
+        this.io().colors().bold().magenta('Options/Flags')
+      )
 
     const optionWithLongestName = this.command?.definition().options().toArray().sort((a, b) => {
       return b.name().length - a.name().length
@@ -178,9 +179,7 @@ export class HelpCommand extends Command {
       this.io().log(`  ${this.io().colors().yellow(option.name())} ${whiteSpace} ${this.io().colors().white().dim(option.description())}`)
     })
 
-    return tap(this, () => {
-      this.io().blankLine()
-    })
+    return this
   }
 
   /**
