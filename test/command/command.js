@@ -2,6 +2,7 @@
 
 const Sinon = require('sinon')
 const { test } = require('tap')
+const { MemoryLogger } = require('@supercharge/console-io')
 const { Application, Command, InputArgumentBuilder, InputOptionBuilder, ArgvInput } = require('../../dist')
 
 test('Command', async () => {
@@ -182,10 +183,15 @@ test('Command', async () => {
       run () { ran = true }
     }
 
-    await new Application()
-      .add(new TestCommand())
-      .run(['test:command', 'argument1'])
+    const app = new Application().add(new TestCommand())
 
+    const logger = new MemoryLogger()
+    app.output().withLogger(logger)
+    await app.run(['test:command', 'argument1'])
+
+    t.ok(
+      logger.logs().find(log => log.message.includes('No arguments expected'))
+    )
     t.equal(ran, false)
     t.equal(processExitStub.calledOnce, true)
     t.equal(processExitStub.calledWith(1), true)
