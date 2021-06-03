@@ -14,6 +14,7 @@ test('Command', async () => {
     const app = new Application()
     const command = new HelpCommand().setApplication(app)
 
+    const initStub = Sinon.stub(app, 'init').returns()
     const commandIoStub = Sinon.stub(command, 'io').returns(io)
     await command.handle()
 
@@ -24,6 +25,7 @@ test('Command', async () => {
       })
     )
 
+    initStub.restore()
     commandIoStub.restore()
   })
 
@@ -167,7 +169,11 @@ test('Command', async () => {
       .setApplication(app)
       .groupCommands()
 
-    t.same(Object.keys(groupedCommands), ['db', 'migrations', 'root'])
+    t.same(Object.keys(groupedCommands), [
+      'root', // goes first because the 'help' command is registered as a default command when initializing the app
+      'db',
+      'migrations'
+    ])
   })
 
   test('sortGroups', async t => {
@@ -186,7 +192,13 @@ test('Command', async () => {
       Object.keys(command.groupCommands())
     )
 
-    t.same(sortedGroupNames, ['root', 'db', 'migrations', 'test'])
+    t.same(sortedGroupNames, [
+      'root',
+      'db',
+      // 'help', // registered as a default command
+      'migrations',
+      'test'
+    ])
   })
 
   test('sortCommands (first by namespace, then by command name)', async t => {
@@ -219,7 +231,7 @@ test('Command', async () => {
 
     t.same(
       groups[0].commands.map(command => command.getName()),
-      ['db', 'list', 'test']
+      ['db', 'help', 'list', 'test'] // 'help' is registered when initializing the app
     )
     t.same(
       groups[1].commands.map(command => command.getName()),
