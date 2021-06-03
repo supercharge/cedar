@@ -1,6 +1,7 @@
 'use strict'
 
 import Set from '@supercharge/set'
+import Str from '@supercharge/strings'
 import { tap } from '@supercharge/goodies'
 import { Command } from './command/command'
 import { ArgvInput } from './input/argv-input'
@@ -27,9 +28,9 @@ interface ApplicationMeta {
   commands: Set<Command>
 
   /**
-   * The default command to run on empty input.
+   * The default command name to run on empty input.
    */
-  defaultCommand: Command
+  defaultCommand: string
 
   /**
    * The default command to run on empty input.
@@ -40,6 +41,16 @@ interface ApplicationMeta {
    * The application’s input definition. Contains the `version` and `help` flags by default.
    */
   definition: InputDefinition
+
+  /**
+   * Determine whether the help command should be used.
+   */
+  wantsHelp: boolean
+
+  /**
+   * Determine whether the application is initialized.
+   */
+  initialized: boolean
 }
 
 export class Application {
@@ -59,8 +70,58 @@ export class Application {
       commands: new Set(),
       output: new ConsoleOutput(),
       definition: this.defaultInputDefinition(),
-      defaultCommand: new HelpCommand().setApplication(this)
+      initialized: false,
+
+      wantsHelp: false,
+      defaultCommand: 'help'
     }
+  }
+
+  /**
+   * Initializes the application.
+   */
+  init (): void {
+    if (this.isInitialized()) {
+      return
+    }
+
+    this
+      .markAsInitialized()
+      .defaultCommands()
+      .forEach(command => {
+        this.add(command)
+      })
+  }
+
+  /**
+   * Determine whether the application is already initialized.
+   *
+   * @returns {Boolean}
+   */
+  isInitialized (): boolean {
+    return this.meta.initialized
+  }
+
+  /**
+   * Mark this application as initialized.
+   *
+   * @returns {Application}
+   */
+  markAsInitialized (): Application {
+    return tap(this, () => {
+      this.meta.initialized = true
+    })
+  }
+
+  /**
+   * Returns the list of default commands for this application.
+   *
+   * @returns {Command[]}
+   */
+  defaultCommands (): Command[] {
+    return [
+      new HelpCommand()
+    ]
   }
 
   /**
@@ -135,6 +196,8 @@ export class Application {
    * @returns {Set<Command>}
    */
   commands (): Set<Command> {
+    this.init()
+
     return this.meta.commands
   }
 
@@ -148,12 +211,43 @@ export class Application {
   }
 
   /**
-   * Returns the default command.
+   * Returns the default command name.
    *
-   * @returns {Command}
+   * @returns {String}
    */
-  defaultCommand (): Command {
+  defaultCommand (): string {
     return this.meta.defaultCommand
+  }
+
+  /**
+   * Determine whether the application should use the help command.
+   *
+   * @returns {Boolean}
+   */
+  wantsHelp (): boolean {
+    return this.meta.wantsHelp
+  }
+
+  /**
+   * Determine whether the application should use the help command.
+   *
+   * @returns {Application}
+   */
+  markAsWantingHelp (): Application {
+    return tap(this, () => {
+      this.meta.wantsHelp = true
+    })
+  }
+
+  /**
+   * Determine whether the application should use the help command.
+   *
+   * @returns {Application}
+   */
+  markAsNotWantingHelp (): Application {
+    return tap(this, () => {
+      this.meta.wantsHelp = false
+    })
   }
 
   /**
@@ -163,13 +257,25 @@ export class Application {
    *
    * @returns {Application}
    */
-  useDefaultCommand (command: Command): Application {
-    if (!(command instanceof Command)) {
-      throw new Error('The default command must be a "Command" instance')
+  useDefaultCommand (command: string | Command): Application {
+    if (!Str.isString(command) && !(command instanceof Command)) {
+      throw new Error('The default command must either be a command name (as string) or a "Command" instance')
+    }
+
+    const commandName = command instanceof Command
+      ? command.getName()
+      : command
+
+    if (Str.isString(command) && this.isMissing(commandName)) {
+      throw new Error(`Cannot set default command "${commandName}" because it is not registered`)
+    }
+
+    if (command instanceof Command && this.isMissing(commandName)) {
+      this.add(command)
     }
 
     return tap(this, () => {
-      this.meta.defaultCommand = command
+      this.meta.defaultCommand = commandName
     })
   }
 
@@ -243,9 +349,13 @@ export class Application {
     }
 
     try {
-      await this.showHelpWhenNecessary(argv)
+      const commandName = argv.firstArgument() || this.defaultCommand()
 
-      const command = this.get(argv.firstArgument()) ?? this.defaultCommand()
+      if (argv.hasOption('help')) {
+        this.markAsWantingHelp()
+      }
+
+      const command = this.get(commandName)
       await command.handle(argv)
 
       await this.terminate()
@@ -255,54 +365,40 @@ export class Application {
   }
 
   /**
-   * Print help output to the terminal. If available, print help for the specific `command`.
-   *
-   * @param argv
-   * @param command
-   */
-  async showHelpWhenNecessary (argv: ArgvInput): Promise<void> {
-    if (argv.isMissingOption('help')) {
-      return
-    }
-
-    await this.runHelpCommand(argv)
-    await this.terminate()
-  }
-
-  /**
-   * Runs the application’s help command.
-   *
-   * @param {ArgvInput} argv
-   */
-  async runHelpCommand (argv: ArgvInput): Promise<void> {
-    await new HelpCommand()
-      .setApplication(this)
-      .forCommand(
-        this.get(argv.firstArgument())
-      )
-      .handle(argv)
-  }
-
-  /**
    * Returns the command for the given `name`. Throws an error if
    * no command is registered for the given name.
    *
    * @param {String} name
    *
    * @returns {Command}
+   *
+   * @throws
    */
-  get (name: string): Command | undefined {
+  get (name: string): Command {
     const command = this.commands().find(command => {
       return command.getName() === name
     })
 
-    if (command) {
-      return command
+    if (name && !command) {
+      throw new Error(`Command "${name}" is not registered`)
     }
 
-    if (name) {
-      throw new Error(`"${name}" command not registered`)
-    }
+    return this.wantsHelp()
+      ? this.helpCommandFor(command)
+      : command as Command
+  }
+
+  /**
+   * Returns an instance of the help command for the given `command`.
+   *
+   * @param {Command|undefined} command
+   *
+   * @returns {HelpCommand}
+   */
+  private helpCommandFor (command: Command | undefined): HelpCommand {
+    this.markAsNotWantingHelp()
+
+    return (this.get('help') as HelpCommand).forCommand(command)
   }
 
   /**

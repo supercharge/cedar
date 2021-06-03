@@ -72,35 +72,6 @@ test('Console Application', async () => {
     t.ok(logger.logs()[0].message.includes('1.2.3'))
   })
 
-  test('help', async t => {
-    const app = new Application().useDefaultCommand(
-      new NoopCommand()
-    )
-
-    const terminateStub = Sinon.stub(app, 'terminate').resolves()
-    const runHelpCommandStub = Sinon.stub(app, 'runHelpCommand').resolves()
-
-    await app.run(['-h'])
-
-    t.ok(runHelpCommandStub.calledOnce)
-    t.ok(terminateStub.calledTwice)
-
-    runHelpCommandStub.restore()
-    terminateStub.restore()
-  })
-
-  test('help not called', async t => {
-    const app = new Application()
-
-    const helpStub = Sinon.stub(app, 'showHelpWhenNecessary').resolves()
-
-    await app.run(['-v'])
-
-    t.ok(helpStub.notCalled)
-
-    helpStub.restore()
-  })
-
   test('register command', async t => {
     const app = new Application()
     app.register('test')
@@ -119,7 +90,7 @@ test('Console Application', async () => {
     const app = new Application()
     app.add(new NoopCommand())
 
-    t.ok(app.has('test'))
+    t.ok(app.has('noop'))
     t.ok(app.isMissing('foo'))
   })
 
@@ -133,17 +104,17 @@ test('Console Application', async () => {
     ])
 
     t.ok(app.has('app'))
-    t.ok(app.has('test'))
+    t.ok(app.has('noop'))
     t.ok(app.isMissing('not:enabled'))
   })
 
   test('all commands', async t => {
     const app = new Application()
-    t.same(app.commands(), [])
+    t.equal(app.commands().size(), 1)
+    t.equal(app.has('help'), true)
 
     app.add(new NoopCommand())
-
-    t.equal(app.commands().size(), 1)
+    t.equal(app.commands().size(), 2)
   })
 
   test('namespaces', async t => {
@@ -265,7 +236,7 @@ test('Console Application', async () => {
     t.ok(outputStub.called)
     t.ok(processExitStub.calledOnce)
     t.ok(processExitStub.calledWith(1))
-    t.ok(String(error.message).includes('command not registered'))
+    t.ok(String(error.message).includes('Command "missing:command" is not registered'))
 
     outputStub.restore()
     processExitStub.restore()
@@ -274,12 +245,11 @@ test('Console Application', async () => {
 
 class NoopCommand extends Command {
   configure () {
-    this.name('test')
+    this.name('noop')
   }
 
-  run () {
-    // do nothing :)
-  }
+  // do nothing :)
+  run () { }
 }
 
 class NotEnabledCommand extends Command {
