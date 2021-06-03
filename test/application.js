@@ -135,7 +135,59 @@ test('Console Application', async () => {
     t.same(app.namspaces(), ['make', 'db'])
   })
 
-  test('with default command', async t => {
+  test('useDefaultCommand via string', async t => {
+    let called = false
+
+    class TestingDefaultCommand extends Command {
+      configure () {
+        this.name('default:command')
+      }
+
+      run () {
+        called = true
+      }
+    }
+
+    const app = new Application().add(new TestingDefaultCommand())
+    const terminateStub = Sinon.stub(app, 'terminate').resolves()
+
+    app.useDefaultCommand('default:command')
+
+    await app.run()
+
+    t.equal(called, true)
+    t.ok(terminateStub.called)
+
+    terminateStub.restore()
+  })
+
+  test('useDefaultCommand via string', async t => {
+    let called = false
+
+    class TestingDefaultCommand extends Command {
+      configure () {
+        this.name('default:command')
+      }
+
+      run () {
+        called = true
+      }
+    }
+
+    const app = new Application().add(new TestingDefaultCommand())
+    const terminateStub = Sinon.stub(app, 'terminate').resolves()
+
+    app.useDefaultCommand('default:command')
+
+    await app.run()
+
+    t.equal(called, true)
+    t.ok(terminateStub.called)
+
+    terminateStub.restore()
+  })
+
+  test('useDefaultCommand via instance', async t => {
     let called = false
 
     class TestingDefaultCommand extends Command {
@@ -165,6 +217,12 @@ test('Console Application', async () => {
     t.throws(() => {
       new Application().useDefaultCommand(new TestingDefaultCommand())
     })
+  })
+
+  test('throws when assigning default command name without registering it first', async t => {
+    t.throws(() => {
+      new Application().useDefaultCommand('default:command')
+    }, 'Cannot set default command')
   })
 
   test('terminate', async t => {
@@ -240,6 +298,45 @@ test('Console Application', async () => {
 
     outputStub.restore()
     processExitStub.restore()
+  })
+
+  test('print version', async t => {
+    const logger = new MemoryLogger()
+
+    const app = new Application().setVersion('cli-version-v1')
+    app.output().withLogger(logger)
+
+    await app.run(['-v'])
+
+    t.ok(
+      logger.logs().find(log => log.message.includes('cli-version-v1'))
+    )
+
+    logger.clearLogs()
+    await app.run(['--version'])
+
+    t.ok(
+      logger.logs().find(log => log.message.includes('cli-version-v1'))
+    )
+  })
+
+  test('simulate help for application', async t => {
+    const logger = new MemoryLogger()
+
+    const app = new Application().setVersion('cli-version-v1')
+    app.output().withLogger(logger)
+
+    const terminateStub = Sinon.stub(app, 'terminate').returns()
+    await app.run(['-h'])
+
+    console.log(logger.logs())
+    console.log('--------------------------------------------')
+
+    t.ok(
+      logger.logs().find(log => log.message.includes(''))
+    )
+
+    terminateStub.restore()
   })
 })
 

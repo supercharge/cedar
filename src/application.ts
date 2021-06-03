@@ -73,7 +73,7 @@ export class Application {
       initialized: false,
 
       wantsHelp: false,
-      defaultCommand: 'help'
+      defaultCommand: ''
     }
   }
 
@@ -378,6 +378,10 @@ export class Application {
     const command = this.commands().find(command => {
       return command.getName() === name
     })
+
+    if (!name && !command) {
+      this.markAsWantingHelp()
+    }
 
     if (name && !command) {
       throw new Error(`Command "${name}" is not registered`)
