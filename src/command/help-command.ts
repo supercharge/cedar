@@ -226,7 +226,9 @@ export class HelpCommand extends Command {
       ? commandWithLongestName.getName().length
       : 0
 
-    this.groupAndSortCommands().forEach(group => {
+    const groups = this.groupAndSortCommands()
+
+    groups.forEach((group, index) => {
       this.isRoot(group)
         ? this.io().log(this.io().colors().bold().magenta('Available commands:'))
         : this.io().log(this.io().colors().bold().magenta(` ${group.name}`))
@@ -237,21 +239,12 @@ export class HelpCommand extends Command {
         this.io().log(`  ${this.io().colors().yellow(command.getName())} ${whiteSpace} ${this.io().colors().white().dim(command.getDescription())}`)
       })
 
-      this.io().blankLine()
+      if (this.isNotLast(index, groups)) {
+        this.io().blankLine()
+      }
     })
 
     return this
-  }
-
-  /**
-   * Determine whether the given `group` is the root group.
-   *
-   * @param {CommandGroup} group
-   *
-   * @returns {Boolean}
-   */
-  private isRoot (group: CommandGroup): boolean {
-    return group.name === 'root'
   }
 
   /**
@@ -321,6 +314,29 @@ export class HelpCommand extends Command {
       if (b < a) return 1
       return -1
     })
+  }
+
+  /**
+   * Determine whether the given `group` is the root group.
+   *
+   * @param {CommandGroup} group
+   *
+   * @returns {Boolean}
+   */
+  private isRoot (group: CommandGroup): boolean {
+    return group.name === 'root'
+  }
+
+  /**
+   * Determine whether the given `index` is not representing the last item in the given `groups`.
+   *
+   * @param {Number} index
+   * @param {CommandGroup[]} groups
+   *
+   * @returns {Boolean}
+   */
+  private isNotLast (index: number, groups: CommandGroup[]): boolean {
+    return index < groups.length - 1
   }
 
   /**
