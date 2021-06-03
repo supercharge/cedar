@@ -188,17 +188,20 @@ export class HelpCommand extends Command {
    * version, command overview and a list of globally available flags.
    */
   private showHelpForApplication (): void {
-    this.outputAppVersion()
-    this.outputCommandOverview()
-    this.outputFlagOverview()
+    this
+      .outputAppVersion()
+      .outputCommandOverview()
+      .outputFlagOverview()
   }
 
   /**
    * Print the application version to the terminal.
    */
-  private outputAppVersion (): void {
+  private outputAppVersion (): HelpCommand {
     this.application().outputNameAndVersion()
     this.io().blankLine()
+
+    return this
   }
 
   /**
@@ -206,13 +209,13 @@ export class HelpCommand extends Command {
    *
    * @returns {HelpCommand}
    */
-  private outputCommandOverview (): void {
+  private outputCommandOverview (): HelpCommand {
     if (this.application().commands().isEmpty()) {
       this.io().log(
         this.io().colors().bold().magenta('No commands available.')
       )
 
-      return
+      return this
     }
 
     const commandWithLongestName = [...this.application().commands()].sort((a, b) => {
@@ -236,6 +239,8 @@ export class HelpCommand extends Command {
 
       this.io().blankLine()
     })
+
+    return this
   }
 
   /**
