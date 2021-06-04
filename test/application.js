@@ -329,12 +329,14 @@ test('Console Application', async () => {
     const terminateStub = Sinon.stub(app, 'terminate').returns()
     await app.run(['-h'])
 
-    console.log(logger.logs())
-    console.log('--------------------------------------------')
+    // TODO
 
-    t.ok(
-      logger.logs().find(log => log.message.includes(''))
-    )
+    // t.ok(
+    //   logger.logs().find(log => log.message.includes('-v, --version'))
+    // )
+    // t.ok(
+    //   logger.logs().find(log => log.message.includes('-h, --help'))
+    // )
 
     terminateStub.restore()
   })
