@@ -48,7 +48,7 @@ test('Command', async () => {
     t.equal(commandIoStub.called, true)
 
     t.ok(logger.logs().find(log => {
-      return log.message.includes('Available commands:')
+      return log.message.includes('Available commands')
     }))
 
     t.ok(logger.logs().find(log => {
@@ -88,7 +88,7 @@ test('Command', async () => {
     }))
 
     t.notOk(logger.logs().find(log => {
-      return log.message.includes('Options/Flags')
+      return log.message.includes('Options')
     }))
 
     commandIoStub.restore()
@@ -132,7 +132,7 @@ test('Command', async () => {
     }))
 
     t.ok(logger.logs().find(log => {
-      return log.message.includes('Options/Flags')
+      return log.message.includes('Options')
     }))
 
     t.ok(logger.logs().find(log => {
