@@ -1,6 +1,7 @@
 'use strict'
 
 import { Command } from './command'
+import { InputOption } from '../input'
 import { tap } from '@supercharge/goodies'
 
 interface CommandGroup { name: string, commands: Command[] }
@@ -155,31 +156,83 @@ export class HelpCommand extends Command {
   private outputCommandOptions (): HelpCommand {
     const options = this.command?.definition().options()
 
-    if (options?.isEmpty()) {
-      return this
-    }
+    return options?.isEmpty()
+      ? this
+      : this.outputOptions(options?.toArray() as InputOption[])
+  }
 
+  /**
+   * Print the given input `options` to the terminal.
+   *
+   * @param {InputOption[]} options
+   */
+  outputOptions (options: InputOption[]): HelpCommand {
     this.io()
       .blankLine()
       .log(
-        this.io().colors().bold().magenta('Options/Flags')
+        this.io().colors().bold().magenta('Options')
       )
 
-    const optionWithLongestName = this.command?.definition().options().toArray().sort((a, b) => {
-      return b.name().length - a.name().length
-    }).shift()
+    const optionWithLongestName = [...options]
+      .sort((a, b) => {
+        return this.totalOptionLength(b) - this.totalOptionLength(a)
+      })
+      .shift()
 
     const maxWidth = optionWithLongestName
-      ? optionWithLongestName.name().length
+      ? this.totalOptionLength(optionWithLongestName)
       : 0
 
-    this.command?.definition().options().forEach(option => {
-      const whiteSpace = ''.padEnd(maxWidth - option.name().length)
-
-      this.io().log(`  ${this.io().colors().yellow(option.name())} ${whiteSpace} ${this.io().colors().white().dim(option.description())}`)
+    options.forEach(option => {
+      this.outputOptionDetails(option, maxWidth)
     })
 
     return this
+  }
+
+  /**
+   * Returns the number of characters required to print the name and shortcuts of the given `option`.
+   *
+   * @param {InputOption} option
+   *
+   * @returns {Number}
+   */
+  totalOptionLength (option: InputOption): number {
+    return option.name().length + this.createShortcutOutputFor(option).length
+  }
+
+  /**
+   * Outputs the shortcuts, name and description for the given `option`.
+   *
+   * @param {InputOption} option
+   * @param {Number} maxWidth
+   *
+   * @returns {HelpCommand}
+   */
+  private outputOptionDetails (option: InputOption, maxWidth: number): void {
+    const whiteSpace = ''.padEnd(maxWidth - this.totalOptionLength(option))
+
+    const output = ['']
+      .concat(this.io().colors().yellow(this.createShortcutOutputFor(option)))
+      .concat(this.io().colors().yellow(`--${option.name()}`))
+      .concat(`   ${whiteSpace}`)
+      .concat(this.io().colors().white().dim(option.description()))
+      .join('')
+
+    this.io().log(`  ${output}`)
+  }
+
+  /**
+   * Returns the output for all shortcuts assigned to the given `option`.
+   *
+   * @param {InputOption} option
+   *
+   * @returns {String}
+   */
+  private createShortcutOutputFor (option: InputOption): string {
+    return option.shortcuts().map(shortcut => {
+      return `-${shortcut}, `
+    }).join('')
   }
 
   /**
@@ -188,19 +241,19 @@ export class HelpCommand extends Command {
    */
   private showHelpForApplication (): void {
     this
-      .outputAppVersion()
-      .outputCommandOverview()
-      .outputFlagOverview()
+      .outputApplicationVersion()
+      .outputApplicationCommandList()
+      .outputApplicationOptions()
   }
 
   /**
    * Print the application version to the terminal.
    */
-  private outputAppVersion (): HelpCommand {
-    this.application().outputNameAndVersion()
-    this.io().blankLine()
-
-    return this
+  private outputApplicationVersion (): HelpCommand {
+    return tap(this, () => {
+      this.application().outputNameAndVersion()
+      this.io().blankLine()
+    })
   }
 
   /**
@@ -208,7 +261,7 @@ export class HelpCommand extends Command {
    *
    * @returns {HelpCommand}
    */
-  private outputCommandOverview (): HelpCommand {
+  private outputApplicationCommandList (): HelpCommand {
     if (this.application().commands().isEmpty()) {
       this.io().log(
         this.io().colors().bold().magenta('No commands available.')
@@ -229,7 +282,7 @@ export class HelpCommand extends Command {
 
     groups.forEach((group, index) => {
       this.isRoot(group)
-        ? this.io().log(this.io().colors().bold().magenta('Available commands:'))
+        ? this.io().log(this.io().colors().bold().magenta('Available commands'))
         : this.io().log(this.io().colors().bold().magenta(` ${group.name}`))
 
       group.commands.forEach(command => {
@@ -341,7 +394,11 @@ export class HelpCommand extends Command {
   /**
    * Print the globally available application flags to the terminal.
    */
-  private outputFlagOverview (): void {
-    //
+  private outputApplicationOptions (): HelpCommand {
+    const options = this.application().definition().options()
+
+    return options.isEmpty()
+      ? this
+      : this.outputOptions(options.toArray())
   }
 }
