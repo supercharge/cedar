@@ -60,12 +60,18 @@ test('Argv Input', async () => {
   })
 
   test('parse options', async t => {
-    const input = new ArgvInput(['test:command', '-h'])
+    const input = new ArgvInput(['test:command', '-h', '--super=charge'])
 
-    input.bind(new InputDefinition([new InputOption('h')]))
+    input.bind(new InputDefinition([
+      new InputOption('h'),
+      new InputOption('super')
+    ]))
 
-    t.equal(input.options().has('h'), true)
+    t.equal(input.hasOption('h'), true)
     t.equal(input.options().get('h'), true)
+    t.equal(input.options().get('super'), 'charge')
+
+    t.equal(input.isMissingOption('max'), true)
   })
 
   test('get parsed option', async t => {
