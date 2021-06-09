@@ -5,7 +5,7 @@
   <br/>
   <br/>
   <p>
-    <h3>Console</h3>
+    <h3>Cedar</h3>
   </p>
   <p>
     Build beautiful console applications.
@@ -19,8 +19,8 @@
   <br/>
   <br/>
   <p>
-    <a href="https://www.npmjs.com/package/@supercharge/console"><img src="https://img.shields.io/npm/v/@supercharge/console.svg" alt="Latest Version"></a>
-    <a href="https://www.npmjs.com/package/@supercharge/console"><img src="https://img.shields.io/npm/dm/@supercharge/console.svg" alt="Monthly downloads"></a>
+    <a href="https://www.npmjs.com/package/@supercharge/cedar"><img src="https://img.shields.io/npm/v/@supercharge/cedar.svg" alt="Latest Version"></a>
+    <a href="https://www.npmjs.com/package/@supercharge/cedar"><img src="https://img.shields.io/npm/dm/@supercharge/cedar.svg" alt="Monthly downloads"></a>
   </p>
   <p>
     <em>Follow <a href="http://twitter.com/marcuspoehls">@marcuspoehls</a> and <a href="http://twitter.com/superchargejs">@superchargejs</a> for updates!</em>
@@ -30,25 +30,25 @@
 ---
 
 ## Introduction
-The `@supercharge/console` package allows you to create beautiful console applications.
+The `@supercharge/cedar` package allows you to create beautiful console applications.
 
 
 ## Installation
 
 ```
-npm i @supercharge/console
+npm i @supercharge/cedar
 ```
 
 
 ## Docs
-Find all the [details for `@supercharge/console` in the extensive Supercharge docs](https://superchargejs.com/docs/console).
+Find all the [details for `@supercharge/cedar` in the extensive Supercharge docs](https://superchargejs.com/docs/console).
 
 
 ## Usage
-Using `@supercharge/console` is pretty straightforward. The package exports a handful of methods that you can reach for when requiring the package:
+Using `@supercharge/cedar` is pretty straightforward. The package exports a handful of methods that you can reach for when requiring the package:
 
 ```js
-const { Application } = require('@supercharge/console')
+const { Application } = require('@supercharge/cedar')
 
 async function run () {
   const app = new Application('console-app-name')

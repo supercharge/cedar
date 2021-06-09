@@ -1,5 +1,5 @@
 {
-  "name": "@supercharge/console",
+  "name": "@supercharge/cedar",
   "description": "Build beautiful command line applications",
   "version": "0.0.0",
   "author": "Marcus Pöhls <marcus@superchargejs.com>",
