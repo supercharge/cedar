@@ -1,11 +1,6 @@
 {
   "extends": "@supercharge/tsconfig",
   "compilerOptions": {
-    "lib": [
-      "es2019",
-      "esnext",
-      "dom",
-    ],
     "outDir": "./dist"
   },
   "include": [
