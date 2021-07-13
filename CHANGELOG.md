@@ -1,6 +1,12 @@
 # Changelog
 
 
+## [1.1.0](https://github.com/supercharge/cedar/compare/v1.0.0...v1.1.0) - 2021-0x-xx
+
+### Updated
+- bump dependencies
+
+
 ## 1.0.0 - 2021-06-12
 
 ### Added
