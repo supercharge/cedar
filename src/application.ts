@@ -297,6 +297,13 @@ export class Application {
     return this.add(command)
   }
 
+  /**
+   * Add the given list of `commands` to this application.
+   *
+   * @param {Command[]} commands
+   *
+   * @returns {Application}
+   */
   addCommands (commands: Command[]): this {
     ([] as Command[])
       .concat(commands)
