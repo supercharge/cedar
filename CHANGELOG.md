@@ -5,6 +5,7 @@
 
 ### Updated
 - bump dependencies
+- use `any` as the return type when retrieving an argument or option in a command
 
 
 ## 1.0.0 - 2021-06-12
