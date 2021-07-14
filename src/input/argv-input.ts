@@ -84,7 +84,7 @@ export class ArgvInput extends Input {
    *
    * @returns {ThisType}
    */
-  private assignOptionsFrom (options: { [key: string]: unknown }): this {
+  private assignOptionsFrom (options: { [key: string]: any }): this {
     Object.entries(options).forEach(([name, value]) => {
       if (this.definition().hasOptionShortcut(name)) {
         const option = this.definition().optionByShortcut(name)

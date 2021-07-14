@@ -200,8 +200,8 @@ export class Command implements CommandContract {
    *
    * @throws
    */
-  addArgument (name: string): InputArgumentBuilder
   addArgument (name: string, callback: (builder: InputArgumentBuilder) => void): Command
+  addArgument (name: string): InputArgumentBuilder
   addArgument (name: string, callback?: any): any {
     if (!name) {
       throw new Error(`Missing argument name in command ${this.constructor.name}`)
@@ -259,7 +259,7 @@ export class Command implements CommandContract {
    *
    * @returns {Map}
    */
-  private arguments (): Map<string, unknown> {
+  private arguments (): Map<string, any> {
     return this.input().arguments()
   }
 
@@ -271,7 +271,7 @@ export class Command implements CommandContract {
    *
    * @returns {*}
    */
-  argument (name: string): unknown {
+  argument (name: string): any {
     if (this.definition().isMissingArgument(name)) {
       throw new Error(`The argument "${name}" does not exist in command "${this.constructor.name}"`)
     }
@@ -286,7 +286,7 @@ export class Command implements CommandContract {
    *
    * @returns {Map}
    */
-  private options (): Map<string, unknown> {
+  private options (): Map<string, any> {
     return this.input().options()
   }
 
@@ -298,7 +298,7 @@ export class Command implements CommandContract {
    *
    * @returns {*}
    */
-  option (name: string): unknown {
+  option (name: string): any {
     if (this.definition().isMissingOption(name)) {
       throw new Error(`The option "${name}" does not exist in command "${this.constructor.name}"`)
     }
@@ -316,8 +316,8 @@ export class Command implements CommandContract {
    *
    * @throws
    */
-  addOption (name: string): InputOptionBuilder
   addOption (name: string, callback: (builder: InputOptionBuilder) => void): Command
+  addOption (name: string): InputOptionBuilder
   addOption (name: string, callback?: any): any {
     if (!name) {
       throw new Error(`Missing option name in command "${this.constructor.name}"`)

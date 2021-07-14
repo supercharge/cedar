@@ -120,7 +120,7 @@ export abstract class Input {
    *
    * @throws
    */
-  option (name: string): unknown {
+  option (name: string): any {
     return this.options().get(name)
   }
 
@@ -130,7 +130,7 @@ export abstract class Input {
     * @param {String} name
     * @param {*} value
     */
-  setOption (name: string, value: unknown): this {
+  setOption (name: string, value: any): this {
     return tap(this, () => {
       this.options().set(name, value)
     })
