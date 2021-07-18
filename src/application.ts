@@ -10,6 +10,7 @@ import { HelpCommand } from './command/help-command'
 import { InputArgument } from './input/input-argument'
 import { ConsoleOutput } from '@supercharge/console-io'
 import { InputDefinition } from './input/input-definition'
+import { ValidationError } from './errors/validation-error'
 
 interface ApplicationMeta {
   /**
@@ -484,13 +485,22 @@ export class Application {
    * @param {Error} error
    */
   async terminate (error?: Error): Promise<void> {
-    const exitCode = error ? 1 : 0
-
     if (!error) {
-      return process.exit(exitCode)
+      return process.exit(0)
     }
 
-    this.output().blankLine().error(error).blankLine()
-    process.exit(exitCode)
+    this.renderError(error)
+    process.exit(1)
+  }
+
+  /**
+   * Print the given `error` to the console.
+   *
+   * @param {Error} error
+   */
+  renderError (error: Error): void {
+    error instanceof ValidationError
+      ? this.output().blankLine().error(error.message).blankLine()
+      : this.output().blankLine().error(error).blankLine()
   }
 }

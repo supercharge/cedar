@@ -294,7 +294,7 @@ test('Console Application', async () => {
     t.ok(outputStub.called)
     t.ok(processExitStub.calledOnce)
     t.ok(processExitStub.calledWith(1))
-    t.ok(String(error.message).includes('Command "missing:command" is not registered'))
+    t.ok(String(error).includes('Command "missing:command" is not registered'))
 
     outputStub.restore()
     processExitStub.restore()

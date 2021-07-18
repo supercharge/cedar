@@ -3,6 +3,7 @@
 import Map from '@supercharge/map'
 import { tap } from '@supercharge/goodies'
 import { InputDefinition } from './input-definition'
+import { ValidationError } from '../errors/validation-error'
 
 export abstract class Input {
   /**
@@ -77,7 +78,7 @@ export abstract class Input {
     })
 
     if (missingArguments.length > 0) {
-      throw new Error(`Not enough arguments provided. Missing: ${missingArguments.join(', ')}`)
+      throw new ValidationError(`Not enough arguments provided. Missing: ${missingArguments.join(', ')}`)
     }
 
     return this

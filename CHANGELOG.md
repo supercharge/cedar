@@ -5,6 +5,7 @@
 
 ### Updated
 - bump dependencies
+- print input binding error message without stack
 - use `any` as the return type when retrieving an argument or option in a command
 - use `isMissing` method instead of the deprecated `missing` in the arguments map
 
