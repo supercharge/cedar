@@ -35,12 +35,12 @@ test('Argv Input', async () => {
     input.bind(new InputDefinition([new InputArgument('name')]))
 
     t.equal(input.arguments().has('name'), true)
-    t.equal(input.arguments().missing('test'), true)
+    t.equal(input.arguments().isMissing('test'), true)
 
     input.bind(new InputDefinition([new InputArgument('testing')]))
 
     t.equal(input.arguments().has('testing'), true)
-    t.equal(input.arguments().missing('test'), true)
+    t.equal(input.arguments().isMissing('test'), true)
   })
 
   test('throws when not expecting arguments but input has some', async t => {

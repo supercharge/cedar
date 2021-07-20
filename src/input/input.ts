@@ -73,7 +73,7 @@ export abstract class Input {
    */
   private validate (): this {
     const missingArguments = this.definition().argumentNames().filter(argument => {
-      return this.arguments().missing(argument) && this.definition().argument(argument)?.isRequired()
+      return this.arguments().isMissing(argument) && this.definition().argument(argument)?.isRequired()
     })
 
     if (missingArguments.length > 0) {
