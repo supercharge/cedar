@@ -6,6 +6,7 @@
 ### Updated
 - bump dependencies
 - use `any` as the return type when retrieving an argument or option in a command
+- use `isMissing` method instead of the deprecated `missing` in the arguments map
 
 
 ## 1.0.0 - 2021-06-12
