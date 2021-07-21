@@ -26,8 +26,16 @@ class HelloCommand extends Command {
       .addArgument('title').description('Your scientific title').optional()
 
     this
-      .addOption('verbose', option => option.shortcuts(['v']).description('verbosity level'))
-      .addOption('random-title', option => option.shortcuts('r').description('generate a random title if none is present'))
+      .addOption('verbose', option => {
+        option
+          .shortcuts(['v'])
+          .description('verbosity level')
+      })
+      .addOption('random-title', option => {
+        option
+          .shortcuts('r')
+          .description('generate a random title if none is present')
+      })
   }
 
   /**
