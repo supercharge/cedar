@@ -1,5 +1,6 @@
 'use strict'
 
+import Set from '@supercharge/set'
 import { tap } from '@supercharge/goodies'
 
 export class InputOption {
@@ -15,7 +16,7 @@ export class InputOption {
     /**
      * The avaialble shortcuts.
      */
-    shortcuts: string[]
+    shortcuts: Set<string>
 
     /**
      * The option description.
@@ -42,7 +43,7 @@ export class InputOption {
     this.meta = {
       name: name ?? '',
       required: false,
-      shortcuts: []
+      shortcuts: new Set()
     }
   }
 
@@ -78,31 +79,29 @@ export class InputOption {
   }
 
   /**
-   * Returns the option shortcut.
+   * Returns the option shortcuts.
    *
    * @returns {String}
    */
   shortcuts (): string[] {
-    return Array.from(
-      new Set(this.meta.shortcuts)
-    )
+    return this.meta.shortcuts.toArray()
   }
 
   /**
-   * Set the option shortcut.
+   * Assign the given `shortcuts` for this option.
    *
    * @param {String} shortcuts
    *
    * @returns {InputOption}
    */
   addShortcuts (shortcuts: string | string[]): this {
-    return tap(this, () => {
-      this.meta.shortcuts = this.meta.shortcuts
-        .concat(shortcuts || [])
-        .map(shortcut => {
-          return String(shortcut).trim()
-        })
+    ([] as string[]).concat(shortcuts || []).forEach(shortcut => {
+      this.meta.shortcuts.add(
+        String(shortcut).trim()
+      )
     })
+
+    return this
   }
 
   /**
