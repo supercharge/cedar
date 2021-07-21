@@ -2,6 +2,7 @@
 
 import { Input } from './input'
 import { tap } from '@supercharge/goodies'
+import { ValidationError } from '../errors'
 import minimist, { ParsedArgs } from 'minimist'
 
 export class ArgvInput extends Input {
@@ -64,17 +65,35 @@ export class ArgvInput extends Input {
         return this.arguments().set(arg?.name(), argument)
       }
 
-      // no arguments expected
-      if (this.definition().arguments().isEmpty()) {
-        throw new Error('No arguments expected')
-      }
+      this.ensureExpectedArguments(args)
 
-      throw new Error(`Too many arguments: expected arguments "${
+      throw new ValidationError(`Too many arguments: expected arguments "${
         this.definition().argumentNames().join(', ')
       }"`)
     })
 
     return this
+  }
+
+  /**
+   * Ensure the input definition expects arguments. Throws an
+   *  error if the comamnd doesn’t expect any arg arguments.
+   *
+   * @param {String[]} args
+   *
+   * @throws
+   */
+  private ensureExpectedArguments (args: string[]): void {
+    if (this.definition().arguments().isNotEmpty()) {
+      // expects arguments
+      return
+    }
+
+    if (this.firstArgument()) {
+      throw new ValidationError(`No arguments expected for command "${this.firstArgument()}"`)
+    }
+
+    throw new ValidationError(`No arguments expected, got ${args.join(', ')}`)
   }
 
   /**
