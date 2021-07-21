@@ -19,17 +19,28 @@ export class InputOptionBuilder {
   }
 
   /**
-   * Set the option description.
+   * Assign the given `shortcut` to this option.
    *
    * @param {String} shortcut
    *
    * @returns {InputOptionBuilder}
    */
-  shortcuts (shortcut: string | string[]): this {
-    shortcut = ([] as string[]).concat(shortcut)
+  shortcut (shortcut: string): this {
+    return this.shortcuts(shortcut)
+  }
+
+  /**
+   * Assign the given `shortcuts` to this option.
+   *
+   * @param {String|String[]} shortcuts
+   *
+   * @returns {InputOptionBuilder}
+   */
+  shortcuts (shortcuts: string | string[]): this {
+    shortcuts = ([] as string[]).concat(shortcuts)
 
     return tap(this, () => {
-      this.option.addShortcuts(shortcut)
+      this.option.addShortcuts(shortcuts)
     })
   }
 
@@ -60,7 +71,7 @@ export class InputOptionBuilder {
   }
 
   /**
-   * Mark the argument as required.
+   * Mark this option as required.
    *
    * @returns {InputOptionBuilder}
    */
@@ -71,7 +82,7 @@ export class InputOptionBuilder {
   }
 
   /**
-   * Mark the argument as optional.
+   * Mark this option as optional.
    *
    * @returns {InputOptionBuilder}
    */
