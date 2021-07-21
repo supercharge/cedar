@@ -111,11 +111,17 @@ export class ArgvInput extends Input {
         return this.setOption(option?.name(), value)
       }
 
-      if (this.definition().hasOption(name)) {
-        return this.options().set(name, value)
+      if (this.definition().isMissingOption(name)) {
+        throw new ValidationError(`Unexpected option "${name}"`)
       }
 
-      throw new Error(`Unexpected option "${name}"`)
+      const option = this.definition().option(name)
+
+      if (option.isRequired() && !value) {
+        throw new ValidationError(`The option "${name}" requires a value`)
+      }
+
+      this.options().set(name, value)
     })
 
     return this

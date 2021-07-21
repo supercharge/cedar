@@ -112,6 +112,23 @@ test('Command', async () => {
     t.throws(() => command.addOption(), 'Missing option name in command "Command"')
   })
 
+  test('throws when not providing a required option', async t => {
+    class TestCommand extends Command {
+      configure () {
+        this
+          .name('test:command')
+          .addOption('dry-run', option => option.required())
+      }
+
+      run () { }
+    }
+
+    const command = new TestCommand()
+    const argv = new ArgvInput(['test:command'])
+
+    await t.rejects(() => command.handle(argv), 'Required options not provided. Missing: dry-run')
+  })
+
   test('option', async t => {
     const command = new Command('')
     command.addOption('dry-run').defaultValue('whynot')

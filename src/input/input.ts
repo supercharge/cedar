@@ -81,6 +81,15 @@ export abstract class Input {
       throw new ValidationError(`Not enough arguments provided. Missing: ${missingArguments.join(', ')}`)
     }
 
+    const missingOptions = this.definition().options()
+      .filter(option => option.isRequired())
+      .filter(option => this.options().isMissing(option.name()))
+
+    if (missingOptions.size() > 0) {
+      const missingOptionNames = missingOptions.map(option => option.name()).join(', ')
+      throw new ValidationError(`Required options not provided. Missing: ${missingOptionNames}`)
+    }
+
     return this
   }
 
