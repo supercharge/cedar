@@ -3,6 +3,9 @@
 
 ## [1.1.0](https://github.com/supercharge/cedar/compare/v1.0.0...v1.1.0) - 2021-0x-xx
 
+### Added
+- validate required options and fail if required options are missing
+
 ### Updated
 - bump dependencies
 - print input binding error message without stack
