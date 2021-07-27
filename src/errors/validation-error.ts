@@ -1,5 +1,5 @@
 'use strict'
 
-export class ValidationError extends Error {
+import { Error } from '@supercharge/errors'
 
-}
+export class ValidationError extends Error {}
