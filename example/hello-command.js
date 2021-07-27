@@ -28,12 +28,12 @@ class HelloCommand extends Command {
     this
       .addOption('verbose', option => {
         option
-          .shortcuts(['v'])
+          .shortcut('v')
           .description('verbosity level')
       })
       .addOption('random-title', option => {
         option
-          .shortcuts('r')
+          .shortcut('r')
           .description('generate a random title if none is present')
       })
   }
