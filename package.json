@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@supercharge/console-io": "~1.1.0",
+    "@supercharge/errors": "~1.0.0",
     "@supercharge/goodies": "~1.9.0",
     "@supercharge/map": "~1.4.0",
     "@supercharge/set": "~2.0.0",
