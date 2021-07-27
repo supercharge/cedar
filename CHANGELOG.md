@@ -1,16 +1,20 @@
 # Changelog
 
 
-## [1.1.0](https://github.com/supercharge/cedar/compare/v1.0.0...v1.1.0) - 2021-0x-xx
+## [1.1.0](https://github.com/supercharge/cedar/compare/v1.0.0...v1.1.0) - 2021-07-27
 
 ### Added
 - validate required options and fail if required options are missing
+- create `ValidationError` class
+- throw validation errors for invalid input
+- add `.shortcut(value: string)` method to the option builder removing the plural method (`shortcuts`) or array for single character shortcuts
 
 ### Updated
 - bump dependencies
-- print input binding error message without stack
+- print input binding and validation error message without stack
 - use `any` as the return type when retrieving an argument or option in a command
 - use `isMissing` method instead of the deprecated `missing` in the arguments map
+- use `any` as the value type for arguments and options (instead of unknown)
 
 
 ## 1.0.0 - 2021-06-12
