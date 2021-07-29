@@ -1,6 +1,15 @@
 # Changelog
 
 
+## [1.2.0](https://github.com/supercharge/cedar/compare/v1.1.0...v1.2.0) - 2021-07-29
+
+### Added
+- the `@supercharge/console-io` update brings us two new IO methods: `.spinner()` and `withSpinner(message, callback)`
+
+### Updated
+- bump dependencies
+
+
 ## [1.1.0](https://github.com/supercharge/cedar/compare/v1.0.0...v1.1.0) - 2021-07-27
 
 ### Added
