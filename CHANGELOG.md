@@ -9,6 +9,7 @@
 ### Updated
 - bump dependencies
 - bump versions in the used GitHub Actions packages
+- update test to avoid printing help output to the console
 
 
 ## [1.2.0](https://github.com/supercharge/cedar/compare/v1.1.0...v1.2.0) - 2021-07-29
