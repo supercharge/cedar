@@ -328,23 +328,19 @@ test('Console Application', async () => {
   })
 
   test('simulate help for application', async t => {
-    const logger = new MemoryLogger()
-
-    const app = new Application().setVersion('cli-version-v1')
-    app.output().withLogger(logger)
-
+    const app = new Application().setVersion('simulalte-help')
     const terminateStub = Sinon.stub(app, 'terminate').returns()
+
+    const consoleLogStub = Sinon.stub(console, 'log').returns()
     await app.run(['-h'])
 
-    // TODO
+    t.ok(consoleLogStub.getCalls().some(call => String(call.firstArg).includes('-h')))
+    t.ok(consoleLogStub.getCalls().some(call => String(call.firstArg).includes('--help')))
 
-    // t.ok(
-    //   logger.logs().find(log => log.message.includes('-v, --version'))
-    // )
-    // t.ok(
-    //   logger.logs().find(log => log.message.includes('-h, --help'))
-    // )
+    t.ok(consoleLogStub.getCalls().some(call => String(call.firstArg).includes('-v')))
+    t.ok(consoleLogStub.getCalls().some(call => String(call.firstArg).includes('--version')))
 
+    consoleLogStub.restore()
     terminateStub.restore()
   })
 })
