@@ -322,8 +322,27 @@ export class Application {
    *
    * @returns {Application}
    */
-  add (command: Command): this {
-    if (!command.getName()) {
+  add (command: Command | typeof Command): this {
+    if (command instanceof Command) {
+      return this.addCommand(command)
+    }
+
+    const CommandConstructor = command
+
+    return this.addCommand(
+      new CommandConstructor()
+    )
+  }
+
+  /**
+   * Ensure that the given `command` has a name and is enabled, then add it to this application.
+   *
+   * @param {Command} command
+   *
+   * @returns {Application}
+   */
+  private addCommand (command: Command): this {
+    if (Str(command.getName()).isEmpty()) {
       throw new Error(`Command "${command.constructor.name}" is missing a command name.`)
     }
 
@@ -367,7 +386,7 @@ export class Application {
       await command.handle(argv)
 
       await this.terminate()
-    } catch (error) {
+    } catch (error: any) {
       await this.terminate(error)
     }
   }

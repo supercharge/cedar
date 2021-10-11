@@ -86,6 +86,13 @@ test('Console Application', async () => {
     t.ok(app.has('supercharge'))
   })
 
+  test('add command via constructor', async t => {
+    const app = new Application()
+    app.add(NoopCommand)
+
+    t.ok(app.has('noop'))
+  })
+
   test('add command', async t => {
     const app = new Application()
     app.add(new NoopCommand())
