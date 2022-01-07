@@ -11,7 +11,7 @@
     "@supercharge/errors": "~1.3.0",
     "@supercharge/goodies": "~1.10.0",
     "@supercharge/map": "~1.5.0",
-    "@supercharge/set": "~2.2.0",
+    "@supercharge/set": "~2.2.1",
     "@supercharge/strings": "~1.24.0",
     "minimist": "~1.2.5",
     "ts-mixer": "~6.0.0"
