@@ -168,32 +168,6 @@ test('Console Application', async () => {
     terminateStub.restore()
   })
 
-  test('useDefaultCommand via string', async t => {
-    let called = false
-
-    class TestingDefaultCommand extends Command {
-      configure () {
-        this.name('default:command')
-      }
-
-      run () {
-        called = true
-      }
-    }
-
-    const app = new Application().add(new TestingDefaultCommand())
-    const terminateStub = Sinon.stub(app, 'terminate').resolves()
-
-    app.useDefaultCommand('default:command')
-
-    await app.run()
-
-    t.equal(called, true)
-    t.ok(terminateStub.called)
-
-    terminateStub.restore()
-  })
-
   test('useDefaultCommand via instance', async t => {
     let called = false
 
