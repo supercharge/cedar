@@ -466,15 +466,9 @@ export class Application {
    */
   namspaces (): string[] {
     return this.commands()
-      .filter(command => {
-        return command.isEnabled()
-      })
-      .filter(command => {
-        return command.getName().split(':').length > 1
-      })
-      .map(command => {
-        return command.getName().split(':')[0]
-      })
+      .filter(command => command.isEnabled())
+      .filter(command => command.getName().split(':').length > 1)
+      .map(command => command.getName().split(':')[0])
       .toArray()
   }
 
@@ -503,7 +497,7 @@ export class Application {
    *
    * @param {Error} error
    */
-  async terminate (error?: Error): Promise<void> {
+  terminate (error?: Error): void {
     if (!error) {
       return process.exit(0)
     }
