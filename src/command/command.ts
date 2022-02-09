@@ -25,7 +25,9 @@ interface CommandMeta {
   io: IO
 }
 
-export class Command<Arguments extends string, Options extends string> implements CommandContract {
+interface KeyStore { [key: string]: any }
+
+export class Command<Arguments = KeyStore, Options = KeyStore> implements CommandContract {
   /**
    * Store the command meta data.
    */
@@ -200,9 +202,9 @@ export class Command<Arguments extends string, Options extends string> implement
    *
    * @throws
    */
-  addArgument<ArgumentName extends Extract<keyof Arguments, string>> (name: ArgumentName, callback: (builder: InputArgumentBuilder) => void): Command<Arguments, Options>
-  addArgument<ArgumentName extends Extract<keyof Arguments, string>> (name: ArgumentName): InputArgumentBuilder
-  addArgument<ArgumentName extends Extract<keyof Arguments, string>> (name: ArgumentName, callback?: any): any {
+  addArgument<ArgumentName extends string> (name: ArgumentName, callback: (builder: InputArgumentBuilder) => void): Command<Arguments & Record<ArgumentName, any>, Options>
+  addArgument<ArgumentName extends string> (name: ArgumentName): InputArgumentBuilder
+  addArgument<ArgumentName extends string> (name: ArgumentName, callback?: any): any {
     if (!name) {
       throw new Error(`Missing argument name in command ${this.constructor.name}`)
     }
@@ -316,9 +318,9 @@ export class Command<Arguments extends string, Options extends string> implement
    *
    * @throws
    */
-  addOption<OptionName extends Extract<keyof Options, string>> (name: OptionName, callback: (builder: InputOptionBuilder) => void): Command<Arguments, Options>
-  addOption<OptionName extends Extract<keyof Options, string>> (name: OptionName): InputOptionBuilder
-  addOption<OptionName extends Extract<keyof Options, string>> (name: OptionName, callback?: any): any {
+  addOption<OptionName extends string> (name: OptionName, callback: (builder: InputOptionBuilder) => void): Command<Arguments, Options & Record<OptionName, any>>
+  addOption<OptionName extends string> (name: OptionName): InputOptionBuilder
+  addOption<OptionName extends string> (name: OptionName, callback?: any): any {
     if (!name) {
       throw new Error(`Missing option name in command "${this.constructor.name}"`)
     }
