@@ -25,7 +25,7 @@ interface CommandMeta {
   io: IO
 }
 
-export class Command implements CommandContract {
+export class Command<Arguments extends string, Options extends string> implements CommandContract {
   /**
    * Store the command meta data.
    */
@@ -200,9 +200,9 @@ export class Command implements CommandContract {
    *
    * @throws
    */
-  addArgument (name: string, callback: (builder: InputArgumentBuilder) => void): Command
-  addArgument (name: string): InputArgumentBuilder
-  addArgument (name: string, callback?: any): any {
+  addArgument<ArgumentName extends Extract<keyof Arguments, string>> (name: ArgumentName, callback: (builder: InputArgumentBuilder) => void): Command<Arguments, Options>
+  addArgument<ArgumentName extends Extract<keyof Arguments, string>> (name: ArgumentName): InputArgumentBuilder
+  addArgument<ArgumentName extends Extract<keyof Arguments, string>> (name: ArgumentName, callback?: any): any {
     if (!name) {
       throw new Error(`Missing argument name in command ${this.constructor.name}`)
     }
@@ -271,7 +271,7 @@ export class Command implements CommandContract {
    *
    * @returns {*}
    */
-  argument (name: string): any {
+  argument<ArgumentName extends Extract<keyof Arguments, string>> (name: ArgumentName): any {
     if (this.definition().isMissingArgument(name)) {
       throw new Error(`The argument "${name}" does not exist in command "${this.constructor.name}"`)
     }
@@ -298,7 +298,7 @@ export class Command implements CommandContract {
    *
    * @returns {*}
    */
-  option (name: string): any {
+  option<OptionName extends Extract<keyof Options, string>> (name: OptionName): any {
     if (this.definition().isMissingOption(name)) {
       throw new Error(`The option "${name}" does not exist in command "${this.constructor.name}"`)
     }
@@ -316,9 +316,9 @@ export class Command implements CommandContract {
    *
    * @throws
    */
-  addOption (name: string, callback: (builder: InputOptionBuilder) => void): Command
-  addOption (name: string): InputOptionBuilder
-  addOption (name: string, callback?: any): any {
+  addOption<OptionName extends Extract<keyof Options, string>> (name: OptionName, callback: (builder: InputOptionBuilder) => void): Command<Arguments, Options>
+  addOption<OptionName extends Extract<keyof Options, string>> (name: OptionName): InputOptionBuilder
+  addOption<OptionName extends Extract<keyof Options, string>> (name: OptionName, callback?: any): any {
     if (!name) {
       throw new Error(`Missing option name in command "${this.constructor.name}"`)
     }
