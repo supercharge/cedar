@@ -158,7 +158,7 @@ export class HelpCommand extends Command {
 
     return options?.isEmpty()
       ? this
-      : this.outputOptions(options?.toArray() as InputOption[])
+      : this.outputOptions(options?.toArray() ?? [])
   }
 
   /**
