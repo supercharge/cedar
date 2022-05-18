@@ -15,7 +15,7 @@ export class HelpCommand extends Command {
   /**
    * Configure the command.
    */
-  configure (): void {
+  override configure (): void {
     this
       .name('help')
       .description('Show help for the application or a given command.')
@@ -47,7 +47,7 @@ export class HelpCommand extends Command {
   /**
    * Output all available commands in the application to the console.
    */
-  async run (): Promise<void> {
+  override async run (): Promise<void> {
     this.hasCommand()
       ? this.showHelpForCommand()
       : this.showHelpForApplication()
