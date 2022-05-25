@@ -12,6 +12,8 @@ import { InputArgument } from '../input/input-argument'
 import { InputDefinition } from '../input/input-definition'
 import { InputOptionBuilder } from '../input/input-option-builder'
 import { InputArgumentBuilder } from '../input/input-argument-builder'
+import { ObjectInput } from '../input/object-input'
+import { Input } from '../input/input'
 
 interface CommandMeta {
   name: string
@@ -19,8 +21,8 @@ interface CommandMeta {
   ignoreValidationErrors: boolean
   application?: Application
 
+  input: Input
   definition: InputDefinition
-  input: ArgvInput
 
   io: IO
 }
@@ -225,7 +227,7 @@ export class Command implements CommandContract {
    *
    * @returns {ArgvInput}
    */
-  private input (): ArgvInput {
+  private input (): Input {
     if (!this.meta.input) {
       throw new Error('Missing input')
     }
@@ -236,13 +238,13 @@ export class Command implements CommandContract {
   /**
    * Assign the given `argv` input to this command.
    *
-   * @param argv
+   * @param args
    *
    * @returns {ThisType}
    */
-  private withInput (argv: ArgvInput): this {
+  private withInput (args: Input): this {
     try {
-      this.meta.input = argv.bind(this.definition())
+      this.meta.input = args.bind(this.definition())
     } catch (error) {
       if (this.shouldThrowValidationErrors()) {
         throw error
@@ -351,7 +353,7 @@ export class Command implements CommandContract {
    * The code to run is provided in the `handle` method. This
    * `handle` method must be implemented by subclasses.
    */
-  async handle (argv: ArgvInput): Promise<any> {
+  async handle (argv: Input): Promise<void> {
     await this.withInput(argv).run()
   }
 
@@ -362,5 +364,19 @@ export class Command implements CommandContract {
    */
   run (): any | Promise<any> {
     throw new Error(`You must implement the "run" method in your "${this.getName()}" command`)
+  }
+
+  /**
+   * Run the given `commandName` with the provided `parameters`.
+   *
+   * @param commandName
+   * @param parameters
+   */
+  async runCommand (commandName: string, parameters?: { arguments?: Record<string, any>, options?: Record<string, any> }): Promise<void> {
+    const command = this.application().get(commandName)
+
+    await command.handle(
+      new ObjectInput(commandName, parameters)
+    )
   }
 }
