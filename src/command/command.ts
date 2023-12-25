@@ -3,17 +3,17 @@
 import { IO } from '../io/io'
 import Map from '@supercharge/map'
 import Str from '@supercharge/strings'
+import { Input } from '../input/input'
 import { tap } from '@supercharge/goodies'
 import { Application } from '../application'
 import { ArgvInput } from '../input/argv-input'
 import { InputOption } from '../input/input-option'
+import { ObjectInput } from '../input/object-input'
 import { CommandContract } from './command-contract'
 import { InputArgument } from '../input/input-argument'
 import { InputDefinition } from '../input/input-definition'
 import { InputOptionBuilder } from '../input/input-option-builder'
 import { InputArgumentBuilder } from '../input/input-argument-builder'
-import { ObjectInput } from '../input/object-input'
-import { Input } from '../input/input'
 
 interface CommandMeta {
   name: string
@@ -362,7 +362,7 @@ export class Command implements CommandContract {
    *
    * @returns {Promise}
    */
-  run (): any | Promise<any> {
+  run (): Promise<any> | any {
     throw new Error(`You must implement the "run" method in your "${this.getName()}" command`)
   }
 

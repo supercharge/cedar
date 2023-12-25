@@ -9,7 +9,10 @@ export class ObjectInput extends Input {
   /**
    * The input arguments. By default `process.argv.slice(2)`
    */
-  private readonly parameters: { arguments?: Record<string, any>, options?: Record<string, any> }
+  private readonly parameters: {
+    arguments?: Record<string, any>
+    options?: Record<string, any>
+  }
 
   /**
    * Create a new instance for the given `args`.
