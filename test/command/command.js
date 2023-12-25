@@ -249,6 +249,49 @@ test('Command', async () => {
       command.input()
     })
   })
+
+  test('runCommand', async t => {
+    const app = new Application()
+
+    const command1 = new Command('first')
+    app.add(command1)
+
+    let didCommand2Ran = false
+    let parametersFromCommand2 = {}
+
+    class SecondCommand extends Command {
+      configure () {
+        this
+          .addArgument('path', argument => argument.optional())
+          .addOption('help', option => option.optional())
+          .addOption('value', option => option.optional())
+      }
+
+      run () {
+        didCommand2Ran = true
+
+        parametersFromCommand2 = {
+          arguments: this.input().arguments().toObject(),
+          options: this.input().options().toObject()
+        }
+      }
+    }
+
+    const command2 = new SecondCommand('second-command')
+    app.add(command2)
+
+    const runCommandParameters = {
+      arguments: {
+        path: 'a/b/c'
+      },
+      options: { help: true, value: 1 }
+    }
+
+    await command1.runCommand('second-command', runCommandParameters)
+
+    t.equal(didCommand2Ran, true)
+    t.same(parametersFromCommand2, runCommandParameters)
+  })
 })
 
 class HiddenCommand extends Command {

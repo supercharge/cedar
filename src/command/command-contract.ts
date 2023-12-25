@@ -19,5 +19,5 @@ export interface CommandContract {
   /**
    * Run the console command.
    */
-  run(): any | Promise<any>
+  run(): Promise<any> | any
 }
